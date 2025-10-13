@@ -65,19 +65,27 @@ const Tasks: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editingTask) {
-        await tasksAPI.update(editingTask.id, formData);
-      } else {
-        await tasksAPI.create(formData);
-      }
-      setIsModalOpen(false);
-      resetForm();
-      fetchTasks();
-    } catch (err: any) {
-      alert(err.message || "Failed to save task");
+  e.preventDefault();
+  try {
+    const submitData = {
+      ...formData,
+      project_id: parseInt(formData.project_id),
+      progress_percentage: parseFloat(
+        formData.progress_percentage.toString()
+      ),
+    };
+
+    if (editingTask) {
+      await tasksAPI.update(editingTask.id, submitData);
+    } else {
+      await tasksAPI.create(submitData);
     }
+    setIsModalOpen(false);
+    resetForm();
+    fetchTasks();
+  } catch (err: any) {
+    alert(err.message || "Failed to save task");
+  }
   };
 
   const handleDelete = async (id: number) => {

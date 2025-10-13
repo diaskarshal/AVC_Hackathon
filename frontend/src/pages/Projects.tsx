@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardHeader, CardBody } from "../components/Card";
+import { Card, CardBody } from "../components/Card";
 import { projectsAPI, Project } from "../services/API";
 
 const Projects: React.FC = () => {

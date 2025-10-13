@@ -63,20 +63,27 @@ const Resources: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editingResource) {
-        await resourcesAPI.update(editingResource.id, formData);
-      } else {
-        await resourcesAPI.create(formData);
-      }
-      setIsModalOpen(false);
-      resetForm();
-      fetchResources();
-    } catch (err: any) {
-      alert(err.message || "Failed to save resource");
+  e.preventDefault();
+  try {
+    const submitData = {
+      ...formData,
+      project_id: parseInt(formData.project_id),
+      quantity: parseFloat(formData.quantity.toString()),
+      unit_cost: parseFloat(formData.unit_cost.toString()),
+    };
+
+    if (editingResource) {
+      await resourcesAPI.update(editingResource.id, submitData);
+    } else {
+      await resourcesAPI.create(submitData);
     }
-  };
+    setIsModalOpen(false);
+    resetForm();
+    fetchResources();
+  } catch (err: any) {
+    alert(err.message || "Failed to save resource");
+  }
+};
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this resource?")) {

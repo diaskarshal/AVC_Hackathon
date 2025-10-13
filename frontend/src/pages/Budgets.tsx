@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardBody } from "../components/Card";
-import { Table, TableHeader, TableBody, TableHead, TableCell } from "../components/Table";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableCell,
+} from "../components/Table";
 import Button from "../components/Button";
 import Modal from "../components/Modal";
 import Input from "../components/Input";
@@ -53,7 +59,9 @@ const Budgets: React.FC = () => {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -62,10 +70,17 @@ const Budgets: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const submitData = {
+        ...formData,
+        project_id: parseInt(formData.project_id),
+        planned_amount: parseFloat(formData.planned_amount.toString()),
+        actual_amount: parseFloat(formData.actual_amount.toString()),
+      };
+
       if (editingBudget) {
-        await budgetsAPI.update(editingBudget.id, formData);
+        await budgetsAPI.update(editingBudget.id, submitData);
       } else {
-        await budgetsAPI.create(formData);
+        await budgetsAPI.create(submitData);
       }
       setIsModalOpen(false);
       resetForm();
@@ -76,7 +91,9 @@ const Budgets: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this budget entry?")) {
+    if (
+      window.confirm("Are you sure you want to delete this budget entry?")
+    ) {
       try {
         await budgetsAPI.delete(id);
         fetchBudgets();
@@ -123,15 +140,23 @@ const Budgets: React.FC = () => {
   };
 
   const filteredBudgets = budgets.filter((budget) => {
-    if (filterProject && budget.project_id.toString() !== filterProject) return false;
+    if (filterProject && budget.project_id.toString() !== filterProject)
+      return false;
     return true;
   });
 
   // Calculate totals
-  const totalPlanned = filteredBudgets.reduce((sum, b) => sum + b.planned_amount, 0);
-  const totalActual = filteredBudgets.reduce((sum, b) => sum + b.actual_amount, 0);
+  const totalPlanned = filteredBudgets.reduce(
+    (sum, b) => sum + b.planned_amount,
+    0
+  );
+  const totalActual = filteredBudgets.reduce(
+    (sum, b) => sum + b.actual_amount,
+    0
+  );
   const totalVariance = totalPlanned - totalActual;
-  const variancePercentage = totalPlanned > 0 ? (totalVariance / totalPlanned) * 100 : 0;
+  const variancePercentage =
+    totalPlanned > 0 ? (totalVariance / totalPlanned) * 100 : 0;
 
   if (loading) {
     return (
@@ -179,7 +204,9 @@ const Budgets: React.FC = () => {
         <Card>
           <CardBody>
             <div className="text-sm text-gray-500">Variance</div>
-            <div className={`text-2xl font-bold ${getVarianceColor(totalVariance)}`}>
+            <div
+              className={`text-2xl font-bold ${getVarianceColor(totalVariance)}`}
+            >
               {formatCurrency(totalVariance)}
             </div>
           </CardBody>
@@ -187,7 +214,9 @@ const Budgets: React.FC = () => {
         <Card>
           <CardBody>
             <div className="text-sm text-gray-500">Variance %</div>
-            <div className={`text-2xl font-bold ${getVarianceColor(totalVariance)}`}>
+            <div
+              className={`text-2xl font-bold ${getVarianceColor(totalVariance)}`}
+            >
               {variancePercentage.toFixed(1)}%
             </div>
           </CardBody>
@@ -205,7 +234,10 @@ const Budgets: React.FC = () => {
               onChange={(e) => setFilterProject(e.target.value)}
               options={[
                 { value: "", label: "All Projects" },
-                ...projects.map((p) => ({ value: p.id.toString(), label: p.name })),
+                ...projects.map((p) => ({
+                  value: p.id.toString(),
+                  label: p.name,
+                })),
               ]}
             />
             <div className="flex items-end">
@@ -238,29 +270,42 @@ const Budgets: React.FC = () => {
             {filteredBudgets.map((budget) => (
               <tr key={budget.id}>
                 <TableCell>
-                  <div className="font-medium text-gray-900">{budget.category}</div>
-                </TableCell>
-                <TableCell>
-                  {projects.find((p) => p.id === budget.project_id)?.name || `Project #${budget.project_id}`}
-                </TableCell>
-                <TableCell>
-                  <div className="text-gray-600 max-w-xs truncate">
-                    {budget.description || <span className="text-gray-400">No description</span>}
+                  <div className="font-medium text-gray-900">
+                    {budget.category}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-semibold">{formatCurrency(budget.planned_amount)}</span>
+                  {projects.find((p) => p.id === budget.project_id)?.name ||
+                    `Project #${budget.project_id}`}
                 </TableCell>
                 <TableCell>
-                  <span className="font-semibold">{formatCurrency(budget.actual_amount)}</span>
+                  <div className="text-gray-600 max-w-xs truncate">
+                    {budget.description || (
+                      <span className="text-gray-400">No description</span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <span className={`font-semibold ${getVarianceColor(budget.variance)}`}>
+                  <span className="font-semibold">
+                    {formatCurrency(budget.planned_amount)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="font-semibold">
+                    {formatCurrency(budget.actual_amount)}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`font-semibold ${getVarianceColor(budget.variance)}`}
+                  >
                     {formatCurrency(budget.variance)}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className={`font-semibold ${getVarianceColor(budget.variance)}`}>
+                  <span
+                    className={`font-semibold ${getVarianceColor(budget.variance)}`}
+                  >
                     {budget.variance_percentage.toFixed(1)}%
                   </span>
                 </TableCell>
@@ -285,7 +330,9 @@ const Budgets: React.FC = () => {
           </TableBody>
         </Table>
         {filteredBudgets.length === 0 && (
-          <div className="text-center py-12 text-gray-500">No budget entries found</div>
+          <div className="text-center py-12 text-gray-500">
+            No budget entries found
+          </div>
         )}
       </Card>
 
@@ -298,4 +345,97 @@ const Budgets: React.FC = () => {
         }}
         title={editingBudget ? "Edit Budget Entry" : "Add Budget Entry"}
       >
-        <form onSubmit
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Select
+            label="Project"
+            name="project_id"
+            value={formData.project_id}
+            onChange={handleInputChange}
+            options={[
+              { value: "", label: "Select a project" },
+              ...projects.map((p) => ({
+                value: p.id.toString(),
+                label: p.name,
+              })),
+            ]}
+            required
+          />
+
+          <Input
+            label="Category"
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            placeholder="e.g., Materials, Labor, Equipment"
+            required
+          />
+
+          <TextArea
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            rows={3}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Planned Amount"
+              type="number"
+              name="planned_amount"
+              value={formData.planned_amount}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              required
+            />
+
+            <Input
+              label="Actual Amount"
+              type="number"
+              name="actual_amount"
+              value={formData.actual_amount}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              required
+            />
+          </div>
+
+          <div className="bg-gray-50 px-4 py-3 rounded">
+            <div className="text-sm text-gray-600">
+              Variance:{" "}
+              <span
+                className={`font-semibold ${getVarianceColor(
+                  parseFloat(formData.planned_amount.toString()) -
+                    parseFloat(formData.actual_amount.toString())
+                )}`}
+              >
+                {formatCurrency(
+                  parseFloat(formData.planned_amount.toString()) -
+                    parseFloat(formData.actual_amount.toString())
+                )}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setIsModalOpen(false);
+                resetForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">
+              {editingBudget ? "Update Budget" : "Add Budget"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+};
+
+export default Budgets;
