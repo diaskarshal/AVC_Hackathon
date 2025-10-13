@@ -18,7 +18,7 @@ class ImportService:
         try:
             excel_file = BytesIO(file_content)
             
-            # Read all sheets
+            # Reads all sheets
             sheets = pd.read_excel(excel_file, sheet_name=None, engine='openpyxl')
             
             stats = {
@@ -55,7 +55,6 @@ class ImportService:
             raise Exception(f"Error importing Excel: {str(e)}")
     
     def import_from_csv(self, file_content: bytes) -> Dict:
-        """Import data from CSV file"""
         try:
             df = pd.read_csv(BytesIO(file_content))
             
@@ -128,7 +127,6 @@ class ImportService:
         return count
     
     def _import_resources(self, df: pd.DataFrame) -> int:
-        """Import resources from dataframe"""
         count = 0
         for _, row in df.iterrows():
             try:

@@ -28,7 +28,6 @@ async def get_budgets(
     limit: int = 50,
     db: Session = Depends(get_db)
 ):
-    """Get all budget entries with optional filtering"""
     query = db.query(Budget)
     
     if project_id:

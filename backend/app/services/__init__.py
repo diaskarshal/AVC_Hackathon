@@ -1,3 +1,5 @@
-from . import analytics_service, import_service, project_service
+from app.services.project_service import ProjectService
+from app.services.analytics_service import AnalyticsService  
+from app.services.import_service import ImportService
 
-__all__ = ["analytics_service", "import_service", "project_service"]
+__all__ = ["ProjectService", "AnalyticsService", "ImportService"]

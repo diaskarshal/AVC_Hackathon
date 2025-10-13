@@ -11,7 +11,6 @@ def add_exception_handlers(app: FastAPI):
     
     @app.exception_handler(BuildFlowException)
     async def buildflow_exception_handler(request: Request, exc: BuildFlowException):
-        """Handle custom BuildFlow exceptions"""
         logger.error(f"BuildFlow error: {exc.message}")
         return JSONResponse(
             status_code=exc.status_code,

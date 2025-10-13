@@ -112,7 +112,6 @@ class AnalyticsService:
         return distribution
     
     def get_project_timeline(self, project_id: int) -> Dict:
-        """Get project timeline with tasks"""
         project = self.db.query(Project).filter(Project.id == project_id).first()
         if not project:
             return {}

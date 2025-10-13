@@ -30,11 +30,9 @@ class Project(Base):
     
     location = Column(String(255))
     
-    # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
     tasks = relationship("Task", back_populates="project", cascade="all, delete-orphan")
     resources = relationship("Resource", back_populates="project", cascade="all, delete-orphan")
     budgets = relationship("Budget", back_populates="project", cascade="all, delete-orphan")

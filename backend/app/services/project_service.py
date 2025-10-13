@@ -18,7 +18,6 @@ class ProjectService:
         return db_project
     
     def get_projects(self, skip: int = 0, limit: int = 10) -> List[Project]:
-        """Get all projects with pagination"""
         return self.db.query(Project).offset(skip).limit(limit).all()
     
     def get_project_by_id(self, project_id: int) -> Optional[Project]:

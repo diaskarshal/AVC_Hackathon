@@ -42,7 +42,8 @@ cd ..
 docker-compose up --build
 docker-compose exec backend python -m app.utils.seed_data #run in a new terminal after the previous line
 ```
-try with sudo in case of "permission denied"
+-----try with sudo in case of "permission denied"-----  
+
 4. **Access the application**
 - Backend API: http://localhost:8000
 - API Documentation: http://localhost:8000/docs

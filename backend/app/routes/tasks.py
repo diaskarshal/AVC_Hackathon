@@ -28,7 +28,6 @@ async def get_tasks(
     limit: int = 50,
     db: Session = Depends(get_db)
 ):
-    """Get all tasks with optional filtering"""
     query = db.query(Task)
     
     if project_id:

@@ -18,7 +18,6 @@ class Budget(Base):
     
     budget_date = Column(DateTime, default=datetime.utcnow)
     
-    # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

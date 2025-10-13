@@ -41,11 +41,9 @@ class Task(Base):
     
     depends_on_task_id = Column(Integer, ForeignKey("tasks.id"), nullable=True)
     
-    # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
     project = relationship("Project", back_populates="tasks")
     dependencies = relationship("Task", remote_side=[id])
     

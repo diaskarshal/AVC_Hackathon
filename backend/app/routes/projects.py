@@ -24,14 +24,12 @@ async def get_projects(
     limit: int = 10,
     db: Session = Depends(get_db)
 ):
-    """Get all projects with pagination"""
     service = ProjectService(db)
     return service.get_projects(skip=skip, limit=limit)
 
 
 @router.get("/summary", response_model=List[ProjectSummary])
 async def get_projects_summary(db: Session = Depends(get_db)):
-    """Get projects summary for dashboard"""
     service = ProjectService(db)
     return service.get_projects_summary()
 

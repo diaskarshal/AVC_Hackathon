@@ -29,7 +29,6 @@ async def get_resources(
     limit: int = 50,
     db: Session = Depends(get_db)
 ):
-    """Get all resources with optional filtering"""
     query = db.query(Resource)
     
     if project_id:
