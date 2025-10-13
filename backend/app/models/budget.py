@@ -13,28 +13,23 @@ class Budget(Base):
     category = Column(String(255), nullable=False)  # Materials, Labor, Equipment, etc.
     description = Column(Text)
     
-    # Financial
     planned_amount = Column(Float, default=0.0)
     actual_amount = Column(Float, default=0.0)
     
-    # Dates
     budget_date = Column(DateTime, default=datetime.utcnow)
     
     # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
     project = relationship("Project", back_populates="budgets")
     
     @property
     def variance(self):
-        """Calculate budget variance (planned - actual)"""
         return self.planned_amount - self.actual_amount
     
     @property
     def variance_percentage(self):
-        """Calculate variance as percentage"""
         if self.planned_amount == 0:
             return 0
         return (self.variance / self.planned_amount) * 100

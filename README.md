@@ -1,6 +1,6 @@
 # BuildFlow ERP System
 
-BuildFlow is a lightweight ERP system for construction project management, developed for the Team 88 hackathon.
+BuildFlow is a ERP system for construction project management.
 
 ## Features
 
@@ -14,23 +14,18 @@ BuildFlow is a lightweight ERP system for construction project management, devel
 
 ## Tech Stack
 
-- **Backend**: FastAPI + Python 3.11
-- **Database**: PostgreSQL 15
-- **Frontend**: React (to be implemented)
+- **Backend**: FastAPI
+- **Database**: PostgreSQL
+- **Frontend**: React
 - **Containerization**: Docker & Docker Compose
 
 ## Quick Start
-
-### Prerequisites
-
-- Docker and Docker Compose installed
-- Git
 
 ### Installation
 
 1. **Clone the repository**
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/diaskarshal/AVC_Hackathon.git
 cd buildflow
 ```
 
@@ -38,19 +33,20 @@ cd buildflow
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your settings if needed
+
 cd ..
 ```
 
 3. **Start the application**
 ```bash
 docker-compose up --build
+docker-compose exec backend python -m app.utils.seed_data #run in a new terminal after the previous line
 ```
-
+try with sudo in case of "permission denied"
 4. **Access the application**
 - Backend API: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
-- Frontend: http://localhost:3000 (when implemented)
+- Frontend: http://localhost:3000
 
 ## Project Structure
 
@@ -150,11 +146,3 @@ docker-compose exec db psql -U buildflow -d buildflow_db
 
 ### Budgets Sheet/CSV
 - project_id, category, description, planned_amount, actual_amount
-
-## Team
-
-Team 88 - BuildFlow Hackathon 2025
-
-## License
-
-Proprietary - All rights reserved to the Organizer per hackathon terms

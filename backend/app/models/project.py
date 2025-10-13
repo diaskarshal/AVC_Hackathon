@@ -21,16 +21,13 @@ class Project(Base):
     description = Column(Text)
     status = Column(Enum(ProjectStatus), default=ProjectStatus.PLANNING)
     
-    # Dates
     start_date = Column(DateTime)
     planned_end_date = Column(DateTime)
     actual_end_date = Column(DateTime, nullable=True)
     
-    # Financial
     total_budget = Column(Float, default=0.0)
     spent_amount = Column(Float, default=0.0)
     
-    # Location
     location = Column(String(255))
     
     # Metadata
@@ -44,12 +41,10 @@ class Project(Base):
     
     @property
     def budget_utilization(self):
-        """Calculate budget utilization percentage"""
         if self.total_budget == 0:
             return 0
         return (self.spent_amount / self.total_budget) * 100
     
     @property
     def remaining_budget(self):
-        """Calculate remaining budget"""
         return self.total_budget - self.spent_amount

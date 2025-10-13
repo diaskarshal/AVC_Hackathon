@@ -31,18 +31,14 @@ class Task(Base):
     status = Column(Enum(TaskStatus), default=TaskStatus.NOT_STARTED)
     priority = Column(Enum(TaskPriority), default=TaskPriority.MEDIUM)
     
-    # Dates
     start_date = Column(DateTime)
     planned_end_date = Column(DateTime)
     actual_end_date = Column(DateTime, nullable=True)
     
-    # Progress
     progress_percentage = Column(Float, default=0.0)
     
-    # Assignment
     assigned_to = Column(String(255))
     
-    # Dependencies
     depends_on_task_id = Column(Integer, ForeignKey("tasks.id"), nullable=True)
     
     # Metadata
@@ -55,7 +51,6 @@ class Task(Base):
     
     @property
     def is_overdue(self):
-        """Check if task is overdue"""
         if self.status != TaskStatus.COMPLETED and self.planned_end_date:
             return datetime.utcnow() > self.planned_end_date
         return False

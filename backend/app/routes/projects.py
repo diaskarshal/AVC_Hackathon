@@ -14,7 +14,6 @@ async def create_project(
     project: ProjectCreate,
     db: Session = Depends(get_db)
 ):
-    """Create a new project"""
     service = ProjectService(db)
     return service.create_project(project)
 
@@ -42,7 +41,6 @@ async def get_project(
     project_id: int,
     db: Session = Depends(get_db)
 ):
-    """Get a specific project by ID"""
     service = ProjectService(db)
     project = service.get_project_by_id(project_id)
     if not project:
@@ -59,7 +57,6 @@ async def update_project(
     project_update: ProjectUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update a project"""
     service = ProjectService(db)
     project = service.update_project(project_id, project_update)
     if not project:
@@ -75,7 +72,6 @@ async def delete_project(
     project_id: int,
     db: Session = Depends(get_db)
 ):
-    """Delete a project"""
     service = ProjectService(db)
     success = service.delete_project(project_id)
     if not success:

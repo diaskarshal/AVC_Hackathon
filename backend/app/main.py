@@ -5,14 +5,12 @@ from app.database import init_db
 from app.routes import projects, resources, tasks, budgets, analytics, import_data
 from app.middleware.error_handler import add_exception_handlers
 
-# Initialize FastAPI app
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     debug=settings.DEBUG
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -21,10 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add custom exception handlers
 add_exception_handlers(app)
 
-# Include routers
 app.include_router(projects.router, prefix="/api/projects", tags=["Projects"])
 app.include_router(tasks.router, prefix="/api/tasks", tags=["Tasks"])
 app.include_router(resources.router, prefix="/api/resources", tags=["Resources"])

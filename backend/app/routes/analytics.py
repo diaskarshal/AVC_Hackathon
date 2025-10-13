@@ -8,28 +8,24 @@ router = APIRouter()
 
 @router.get("/dashboard")
 async def get_dashboard_stats(db: Session = Depends(get_db)):
-    """Get overall dashboard statistics"""
     service = AnalyticsService(db)
     return service.get_dashboard_stats()
 
 
 @router.get("/project/{project_id}/kpi")
 async def get_project_kpi(project_id: int, db: Session = Depends(get_db)):
-    """Get KPIs for a specific project"""
     service = AnalyticsService(db)
     return service.get_project_kpi(project_id)
 
 
 @router.get("/project/{project_id}/budget-breakdown")
 async def get_budget_breakdown(project_id: int, db: Session = Depends(get_db)):
-    """Get budget breakdown by category"""
     service = AnalyticsService(db)
     return service.get_budget_breakdown(project_id)
 
 
 @router.get("/project/{project_id}/resource-distribution")
 async def get_resource_distribution(project_id: int, db: Session = Depends(get_db)):
-    """Get resource distribution by type"""
     service = AnalyticsService(db)
     return service.get_resource_distribution(project_id)
 

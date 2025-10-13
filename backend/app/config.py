@@ -8,13 +8,10 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
     
-    # Database
     DATABASE_URL: str = "postgresql://buildflow:buildflow123@db:5432/buildflow_db"
     
-    # CORS
     CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:5173"]
     
-    # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

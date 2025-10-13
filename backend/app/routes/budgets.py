@@ -13,7 +13,6 @@ async def create_budget(
     budget: BudgetCreate,
     db: Session = Depends(get_db)
 ):
-    """Create a new budget entry"""
     db_budget = Budget(**budget.model_dump())
     db.add(db_budget)
     db.commit()
@@ -45,7 +44,6 @@ async def get_budget(
     budget_id: int,
     db: Session = Depends(get_db)
 ):
-    """Get a specific budget entry by ID"""
     budget = db.query(Budget).filter(Budget.id == budget_id).first()
     if not budget:
         raise HTTPException(
@@ -61,7 +59,6 @@ async def update_budget(
     budget_update: BudgetUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update a budget entry"""
     db_budget = db.query(Budget).filter(Budget.id == budget_id).first()
     if not db_budget:
         raise HTTPException(
@@ -83,7 +80,6 @@ async def delete_budget(
     budget_id: int,
     db: Session = Depends(get_db)
 ):
-    """Delete a budget entry"""
     db_budget = db.query(Budget).filter(Budget.id == budget_id).first()
     if not db_budget:
         raise HTTPException(

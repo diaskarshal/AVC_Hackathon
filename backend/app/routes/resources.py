@@ -13,7 +13,6 @@ async def create_resource(
     resource: ResourceCreate,
     db: Session = Depends(get_db)
 ):
-    """Create a new resource"""
     db_resource = Resource(**resource.model_dump())
     db_resource.calculate_total_cost()
     db.add(db_resource)
@@ -46,7 +45,6 @@ async def get_resource(
     resource_id: int,
     db: Session = Depends(get_db)
 ):
-    """Get a specific resource by ID"""
     resource = db.query(Resource).filter(Resource.id == resource_id).first()
     if not resource:
         raise HTTPException(
@@ -62,7 +60,6 @@ async def update_resource(
     resource_update: ResourceUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update a resource"""
     db_resource = db.query(Resource).filter(Resource.id == resource_id).first()
     if not db_resource:
         raise HTTPException(
@@ -85,7 +82,6 @@ async def delete_resource(
     resource_id: int,
     db: Session = Depends(get_db)
 ):
-    """Delete a resource"""
     db_resource = db.query(Resource).filter(Resource.id == resource_id).first()
     if not db_resource:
         raise HTTPException(

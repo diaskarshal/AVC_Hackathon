@@ -1,6 +1,6 @@
 """
 Seed script to populate database with sample data for demo purposes.
-Run with: docker-compose exec backend python -m app.utils.seed_data
+Run with: docker-compose exec backend python -m app.utils.seed_data in a new terminal after the docker-compose is up
 """
 
 from datetime import datetime, timedelta
@@ -14,7 +14,6 @@ from app.models import (
 
 
 def seed_database():
-    """Populate database with sample construction projects"""
     db = SessionLocal()
     
     try:
@@ -241,7 +240,7 @@ def seed_database():
         
         # Create Budget entries
         budgets = [
-            # Project 1 Budgets
+            # Project 1
             {
                 "project_id": projects[0].id,
                 "category": "Materials",
@@ -270,7 +269,7 @@ def seed_database():
                 "planned_amount": 500000.0,
                 "actual_amount": 0.0
             },
-            # Project 2 Budgets
+            # Project 2
             {
                 "project_id": projects[1].id,
                 "category": "Materials",

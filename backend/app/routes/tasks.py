@@ -13,7 +13,6 @@ async def create_task(
     task: TaskCreate,
     db: Session = Depends(get_db)
 ):
-    """Create a new task"""
     db_task = Task(**task.model_dump())
     db.add(db_task)
     db.commit()
@@ -45,7 +44,6 @@ async def get_task(
     task_id: int,
     db: Session = Depends(get_db)
 ):
-    """Get a specific task by ID"""
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(
@@ -61,7 +59,6 @@ async def update_task(
     task_update: TaskUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update a task"""
     db_task = db.query(Task).filter(Task.id == task_id).first()
     if not db_task:
         raise HTTPException(
@@ -83,7 +80,6 @@ async def delete_task(
     task_id: int,
     db: Session = Depends(get_db)
 ):
-    """Delete a task"""
     db_task = db.query(Task).filter(Task.id == task_id).first()
     if not db_task:
         raise HTTPException(
@@ -101,7 +97,6 @@ async def get_overdue_tasks(
     project_id: int,
     db: Session = Depends(get_db)
 ):
-    """Get all overdue tasks for a project"""
     from datetime import datetime
     tasks = db.query(Task).filter(
         Task.project_id == project_id,

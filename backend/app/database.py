@@ -10,7 +10,6 @@ Base = declarative_base()
 
 
 def get_db():
-    """Dependency for getting database session"""
     db = SessionLocal()
     try:
         yield db
@@ -19,5 +18,4 @@ def get_db():
 
 
 def init_db():
-    """Initialize database tables"""
     Base.metadata.create_all(bind=engine)

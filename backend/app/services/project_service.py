@@ -11,7 +11,6 @@ class ProjectService:
         self.db = db
     
     def create_project(self, project: ProjectCreate) -> Project:
-        """Create a new project"""
         db_project = Project(**project.model_dump())
         self.db.add(db_project)
         self.db.commit()
@@ -23,11 +22,9 @@ class ProjectService:
         return self.db.query(Project).offset(skip).limit(limit).all()
     
     def get_project_by_id(self, project_id: int) -> Optional[Project]:
-        """Get project by ID"""
         return self.db.query(Project).filter(Project.id == project_id).first()
     
     def update_project(self, project_id: int, project_update: ProjectUpdate) -> Optional[Project]:
-        """Update project"""
         db_project = self.get_project_by_id(project_id)
         if not db_project:
             return None
@@ -42,7 +39,6 @@ class ProjectService:
         return db_project
     
     def delete_project(self, project_id: int) -> bool:
-        """Delete project"""
         db_project = self.get_project_by_id(project_id)
         if not db_project:
             return False
@@ -52,7 +48,7 @@ class ProjectService:
         return True
     
     def get_projects_summary(self) -> List[dict]:
-        """Get projects summary with progress calculation"""
+        """Get projects summary + progress"""
         projects = self.db.query(Project).all()
         summaries = []
         

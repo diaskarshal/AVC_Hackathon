@@ -13,7 +13,6 @@ class AnalyticsService:
         self.db = db
     
     def get_dashboard_stats(self) -> Dict:
-        """Get overall dashboard statistics"""
         total_projects = self.db.query(Project).count()
         active_projects = self.db.query(Project).filter(
             Project.status == ProjectStatus.IN_PROGRESS

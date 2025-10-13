@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 def add_exception_handlers(app: FastAPI):
-    """Add custom exception handlers to FastAPI app"""
     
     @app.exception_handler(BuildFlowException)
     async def buildflow_exception_handler(request: Request, exc: BuildFlowException):
@@ -21,7 +20,6 @@ def add_exception_handlers(app: FastAPI):
     
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        """Handle validation errors"""
         logger.error(f"Validation error: {exc.errors()}")
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -30,7 +28,6 @@ def add_exception_handlers(app: FastAPI):
     
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
-        """Handle general exceptions"""
         logger.error(f"Unexpected error: {str(exc)}", exc_info=True)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
