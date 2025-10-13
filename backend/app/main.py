@@ -2,18 +2,23 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import init_db
-from app.routes import projects, resources, tasks, budgets, analytics, import_data
+from app.routes import (
+    projects,
+    resources,
+    tasks,
+    budgets,
+    analytics,
+    import_data,
+)
 from app.middleware.error_handler import add_exception_handlers
 
 app = FastAPI(
-    title=settings.APP_NAME,
-    version=settings.APP_VERSION,
-    debug=settings.DEBUG
+    title=settings.APP_NAME, version=settings.APP_VERSION, debug=settings.DEBUG
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.cors_origins_list,  # use the property from the config.py
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -23,9 +28,13 @@ add_exception_handlers(app)
 
 app.include_router(projects.router, prefix="/api/projects", tags=["Projects"])
 app.include_router(tasks.router, prefix="/api/tasks", tags=["Tasks"])
-app.include_router(resources.router, prefix="/api/resources", tags=["Resources"])
+app.include_router(
+    resources.router, prefix="/api/resources", tags=["Resources"]
+)
 app.include_router(budgets.router, prefix="/api/budgets", tags=["Budgets"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
+app.include_router(
+    analytics.router, prefix="/api/analytics", tags=["Analytics"]
+)
 app.include_router(import_data.router, prefix="/api/import", tags=["Import"])
 
 
@@ -41,7 +50,7 @@ async def root():
     return {
         "message": "Welcome to BuildFlow ERP API",
         "version": settings.APP_VERSION,
-        "docs": "/docs"
+        "docs": "/docs",
     }
 
 
