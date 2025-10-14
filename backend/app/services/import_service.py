@@ -28,22 +28,18 @@ class ImportService:
                 "budgets": 0
             }
             
-            # Import projects
             if 'Projects' in sheets or 'projects' in sheets:
                 sheet_name = 'Projects' if 'Projects' in sheets else 'projects'
                 stats["projects"] = self._import_projects(sheets[sheet_name])
             
-            # Import tasks
             if 'Tasks' in sheets or 'tasks' in sheets:
                 sheet_name = 'Tasks' if 'Tasks' in sheets else 'tasks'
                 stats["tasks"] = self._import_tasks(sheets[sheet_name])
             
-            # Import resources
             if 'Resources' in sheets or 'resources' in sheets:
                 sheet_name = 'Resources' if 'Resources' in sheets else 'resources'
                 stats["resources"] = self._import_resources(sheets[sheet_name])
             
-            # Import budgets
             if 'Budgets' in sheets or 'budgets' in sheets:
                 sheet_name = 'Budgets' if 'Budgets' in sheets else 'budgets'
                 stats["budgets"] = self._import_budgets(sheets[sheet_name])
@@ -56,25 +52,36 @@ class ImportService:
     
     def import_from_csv(self, file_content: bytes) -> Dict:
         try:
-            df = pd.read_csv(BytesIO(file_content))
+            df = None
+            for delimiter in [',', ';', '\t']:
+                try:
+                    df = pd.read_csv(BytesIO(file_content), delimiter=delimiter)
+                    if len(df.columns) > 1:
+                        break
+                except:
+                    continue
             
-            # Detect what type of data is in the CSV based on columns
-            columns = set(df.columns.str.lower())
+            if df is None or len(df.columns) <= 1:
+                raise Exception("Unable to parse CSV file")
             
-            if 'project_name' in columns or 'name' in columns:
+            df.columns = df.columns.str.strip().str.lower()
+            columns = set(df.columns)
+            
+            # Detect data type based on columns
+            if 'project_name' in columns or ('name' in columns and 'total_budget' in columns):
                 count = self._import_projects(df)
-                return {"projects": count}
-            elif 'task_name' in columns:
+                return {"projects": count, "tasks": 0, "resources": 0, "budgets": 0}
+            elif 'task_name' in columns or ('project_id' in columns and 'assigned_to' in columns):
                 count = self._import_tasks(df)
-                return {"tasks": count}
+                return {"projects": 0, "tasks": count, "resources": 0, "budgets": 0}
             elif 'resource_name' in columns or 'resource_type' in columns:
                 count = self._import_resources(df)
-                return {"resources": count}
-            elif 'category' in columns or 'planned_amount' in columns:
-                count = self._import_resources(df)
-                return {"budgets": count}
+                return {"projects": 0, "tasks": 0, "resources": count, "budgets": 0}
+            elif 'category' in columns and 'planned_amount' in columns:
+                count = self._import_budgets(df)
+                return {"projects": 0, "tasks": 0, "resources": 0, "budgets": count}
             else:
-                raise Exception("Unable to determine CSV data type")
+                raise Exception(f"Unable to determine CSV data type. Columns found: {', '.join(columns)}")
         
         except Exception as e:
             self.db.rollback()
@@ -83,17 +90,22 @@ class ImportService:
     def _import_projects(self, df: pd.DataFrame) -> int:
         """Import projects from dataframe"""
         count = 0
+        df.columns = df.columns.str.strip().str.lower()
+        
         for _, row in df.iterrows():
             try:
+                # Handle different column name variations
+                name = row.get('name') or row.get('project_name', f"Project {count+1}")
+                
                 project = Project(
-                    name=row.get('name') or row.get('project_name', f"Project {count+1}"),
-                    description=row.get('description', ''),
-                    status=ProjectStatus(row.get('status', 'planning').lower()),
+                    name=str(name),
+                    description=str(row.get('description', '')),
+                    status=self._parse_project_status(row.get('status', 'planning')),
                     start_date=pd.to_datetime(row.get('start_date')) if pd.notna(row.get('start_date')) else None,
-                    planned_end_date=pd.to_datetime(row.get('end_date')) if pd.notna(row.get('end_date')) else None,
+                    planned_end_date=pd.to_datetime(row.get('end_date') or row.get('planned_end_date')) if pd.notna(row.get('end_date') or row.get('planned_end_date')) else None,
                     total_budget=float(row.get('total_budget', 0)),
                     spent_amount=float(row.get('spent_amount', 0)),
-                    location=row.get('location', '')
+                    location=str(row.get('location', ''))
                 )
                 self.db.add(project)
                 count += 1
@@ -107,18 +119,23 @@ class ImportService:
     def _import_tasks(self, df: pd.DataFrame) -> int:
         """Import tasks from dataframe"""
         count = 0
+        df.columns = df.columns.str.strip().str.lower()
+        
         for _, row in df.iterrows():
             try:
+                # Handle different column name variations
+                name = row.get('name') or row.get('task_name', f"Task {count+1}")
+                
                 task = Task(
                     project_id=int(row.get('project_id', 1)),
-                    name=row.get('name') or row.get('task_name', f"Task {count+1}"),
-                    description=row.get('description', ''),
-                    status=TaskStatus(row.get('status', 'not_started').lower()),
-                    priority=TaskPriority(row.get('priority', 'medium').lower()),
+                    name=str(name),
+                    description=str(row.get('description', '')),
+                    status=self._parse_task_status(row.get('status', 'not_started')),
+                    priority=self._parse_task_priority(row.get('priority', 'medium')),
                     start_date=pd.to_datetime(row.get('start_date')) if pd.notna(row.get('start_date')) else None,
-                    planned_end_date=pd.to_datetime(row.get('end_date')) if pd.notna(row.get('end_date')) else None,
-                    progress_percentage=float(row.get('progress', 0)),
-                    assigned_to=row.get('assigned_to', '')
+                    planned_end_date=pd.to_datetime(row.get('end_date') or row.get('planned_end_date')) if pd.notna(row.get('end_date') or row.get('planned_end_date')) else None,
+                    progress_percentage=float(row.get('progress') or row.get('progress_percentage', 0)),
+                    assigned_to=str(row.get('assigned_to', ''))
                 )
                 self.db.add(task)
                 count += 1
@@ -131,17 +148,22 @@ class ImportService:
     
     def _import_resources(self, df: pd.DataFrame) -> int:
         count = 0
+        df.columns = df.columns.str.strip().str.lower()
+        
         for _, row in df.iterrows():
             try:
+                # Handle different column name variations
+                name = row.get('name') or row.get('resource_name', f"Resource {count+1}")
+                
                 resource = Resource(
                     project_id=int(row.get('project_id', 1)),
-                    name=row.get('name') or row.get('resource_name', f"Resource {count+1}"),
-                    resource_type=ResourceType(row.get('resource_type', 'material').lower()),
-                    status=ResourceStatus(row.get('status', 'available').lower()),
-                    quantity=float(row.get('quantity', 0)), #??
-                    unit=row.get('unit', 'units'),
-                    unit_cost=float(row.get('unit_cost', 0)),#??
-                    supplier=row.get('supplier', '')
+                    name=str(name),
+                    resource_type=self._parse_resource_type(row.get('resource_type', 'material')),
+                    status=self._parse_resource_status(row.get('status', 'available')),
+                    quantity=float(row.get('quantity', 0)),
+                    unit=str(row.get('unit', 'units')),
+                    unit_cost=float(row.get('unit_cost', 0)),
+                    supplier=str(row.get('supplier', ''))
                 )
                 resource.calculate_total_cost()
                 self.db.add(resource)
@@ -156,12 +178,14 @@ class ImportService:
     def _import_budgets(self, df: pd.DataFrame) -> int:
         """Import budgets from dataframe"""
         count = 0
+        df.columns = df.columns.str.strip().str.lower()
+        
         for _, row in df.iterrows():
             try:
                 budget = Budget(
                     project_id=int(row.get('project_id', 1)),
-                    category=row.get('category', 'General'),
-                    description=row.get('description', ''),
+                    category=str(row.get('category', 'General')),
+                    description=str(row.get('description', '')),
                     planned_amount=float(row.get('planned_amount', 0)),
                     actual_amount=float(row.get('actual_amount', 0))
                 )
@@ -173,3 +197,56 @@ class ImportService:
         
         self.db.commit()
         return count
+    
+    # Helper methods to parse enum values
+    def _parse_project_status(self, status: str) -> ProjectStatus:
+        status_map = {
+            'planning': ProjectStatus.PLANNING,
+            'in_progress': ProjectStatus.IN_PROGRESS,
+            'active': ProjectStatus.IN_PROGRESS,
+            'on_hold': ProjectStatus.ON_HOLD,
+            'completed': ProjectStatus.COMPLETED,
+            'cancelled': ProjectStatus.CANCELLED
+        }
+        return status_map.get(str(status).lower().strip(), ProjectStatus.PLANNING)
+    
+    def _parse_task_status(self, status: str) -> TaskStatus:
+        status_map = {
+            'not_started': TaskStatus.NOT_STARTED,
+            'in_progress': TaskStatus.IN_PROGRESS,
+            'active': TaskStatus.IN_PROGRESS,
+            'completed': TaskStatus.COMPLETED,
+            'delayed': TaskStatus.DELAYED,
+            'blocked': TaskStatus.BLOCKED
+        }
+        return status_map.get(str(status).lower().strip(), TaskStatus.NOT_STARTED)
+    
+    def _parse_task_priority(self, priority: str) -> TaskPriority:
+        priority_map = {
+            'low': TaskPriority.LOW,
+            'medium': TaskPriority.MEDIUM,
+            'high': TaskPriority.HIGH,
+            'critical': TaskPriority.CRITICAL
+        }
+        return priority_map.get(str(priority).lower().strip(), TaskPriority.MEDIUM)
+    
+    def _parse_resource_type(self, resource_type: str) -> ResourceType:
+        type_map = {
+            'material': ResourceType.MATERIAL,
+            'equipment': ResourceType.EQUIPMENT,
+            'labor': ResourceType.LABOR,
+            'human': ResourceType.LABOR
+        }
+        return type_map.get(str(resource_type).lower().strip(), ResourceType.MATERIAL)
+    
+    def _parse_resource_status(self, status: str) -> ResourceStatus:
+        status_map = {
+            'available': ResourceStatus.AVAILABLE,
+            'in_use': ResourceStatus.IN_USE,
+            'active': ResourceStatus.IN_USE,
+            'depleted': ResourceStatus.DEPLETED,
+            'maintenance': ResourceStatus.MAINTENANCE,
+            'ordered': ResourceStatus.AVAILABLE,
+            'retired': ResourceStatus.DEPLETED
+        }
+        return status_map.get(str(status).lower().strip(), ResourceStatus.AVAILABLE)

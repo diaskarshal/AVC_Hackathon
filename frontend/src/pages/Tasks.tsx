@@ -65,27 +65,40 @@ const Tasks: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    const submitData = {
-      ...formData,
-      project_id: parseInt(formData.project_id),
-      progress_percentage: parseFloat(
-        formData.progress_percentage.toString()
-      ),
-    };
+    e.preventDefault();
+    try {
+      const submitData: any = {
+        project_id: parseInt(formData.project_id),
+        name: formData.name,
+        description: formData.description || undefined,
+        status: formData.status,
+        priority: formData.priority,
+        progress_percentage: parseFloat(formData.progress_percentage.toString()),
+        assigned_to: formData.assigned_to || undefined,
+      };
 
-    if (editingTask) {
-      await tasksAPI.update(editingTask.id, submitData);
-    } else {
-      await tasksAPI.create(submitData);
+      // Only include dates if they are filled
+      if (formData.start_date) {
+        submitData.start_date = new Date(formData.start_date).toISOString();
+      }
+      if (formData.planned_end_date) {
+        submitData.planned_end_date = new Date(formData.planned_end_date).toISOString();
+      }
+
+      if (editingTask) {
+        await tasksAPI.update(editingTask.id, submitData);
+      } else {
+        await tasksAPI.create(submitData);
+      }
+      setIsModalOpen(false);
+      resetForm();
+      fetchTasks();
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.detail 
+        ? JSON.stringify(err.response.data.detail)
+        : err.message || "Failed to save task";
+      alert(errorMsg);
     }
-    setIsModalOpen(false);
-    resetForm();
-    fetchTasks();
-  } catch (err: any) {
-    alert(err.message || "Failed to save task");
-  }
   };
 
   const handleDelete = async (id: number) => {
@@ -157,6 +170,13 @@ const Tasks: React.FC = () => {
     return true;
   });
 
+  // Calculate statistics
+  const totalTasks = filteredTasks.length;
+  const completedTasks = filteredTasks.filter(t => t.status === "completed").length;
+  const inProgressTasks = filteredTasks.filter(t => t.status === "in_progress").length;
+  const overdueTasks = filteredTasks.filter(t => t.is_overdue).length;
+  const completionRate = totalTasks > 0 ? (completedTasks / totalTasks * 100) : 0;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -180,6 +200,37 @@ const Tasks: React.FC = () => {
         <Button onClick={() => setIsModalOpen(true)}>
           Create New Task
         </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardBody>
+            <div className="text-sm text-gray-500">Total Tasks</div>
+            <div className="text-2xl font-bold text-gray-900">{totalTasks}</div>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <div className="text-sm text-gray-500">Completed</div>
+            <div className="text-2xl font-bold text-green-600">{completedTasks}</div>
+            <div className="text-xs text-gray-500 mt-1">
+              {completionRate.toFixed(1)}% completion rate
+            </div>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <div className="text-sm text-gray-500">In Progress</div>
+            <div className="text-2xl font-bold text-blue-600">{inProgressTasks}</div>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <div className="text-sm text-gray-500">Overdue</div>
+            <div className="text-2xl font-bold text-red-600">{overdueTasks}</div>
+          </CardBody>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -263,7 +314,7 @@ const Tasks: React.FC = () => {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className={`font-semibold ${getPriorityColor(task.priority)}`}>
+                  <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
                     {task.priority}
                   </span>
                 </TableCell>

@@ -1,18 +1,13 @@
 # BuildFlow ERP System
 todo:
-- implement create new project button; 
-- fix create new task button ("POST /api/tasks/ HTTP/1.1" 422 Unprocessable Entity);
-- add project window (see each project in new modal/window) + update/delete project;
-- fix edit task in the tasks tab(Request failed with status code 422);
-- show total tasks / statistics in the tasks tab like in a resources tab;
-- add export project(s)/task(s)/resource(s)/budget(s) in an individual modal or an according tab;
-- fix import csv files; 
-    - BUDGETS (Import failed: Error importing CSV: Unable to determine CSV data type);
-    - PROJECTS (Projects imported: 1) but does not show it in the projects tab, and updates the stats in the dashboard;
-    - RESOURCES (Projects imported: 0);
-    - TASKS (Projects imported: 2)
-it seems all files are trying to get added to the projects. after changing colons to the semi-colon type, all failed.  
-backend/app/services/import_service.py
+- implement create new project button in the dashboard;
+- fix the "Spent: " entry in the project modal; 
+- strange behaviour in projects tab: previously added projects are not shown unless one of the shown projects in the projects tab is updated; new added projects are not shown;
+- add export button to project(s)/task(s)/resource(s)/budget(s) tab;
+- fix import csv files
+    - the output after "upload and import" shows redundant info (when importing tasks, all others are also shown with 0s).
+    - the import files must be in the correct order, first should be project.csv, because if not, other table entries(tasks, budgets, resources) will use from the existing project name entries;
+    - the update of the resource that was imported as said previously does not work. it does not update to the existing project that was imported later, it still chooses the old one.
 
 BuildFlow is a ERP system for construction project management.
 
