@@ -70,6 +70,9 @@ class ImportService:
             elif 'resource_name' in columns or 'resource_type' in columns:
                 count = self._import_resources(df)
                 return {"resources": count}
+            elif 'category' in columns or 'planned_amount' in columns:
+                count = self._import_resources(df)
+                return {"budgets": count}
             else:
                 raise Exception("Unable to determine CSV data type")
         
@@ -135,9 +138,9 @@ class ImportService:
                     name=row.get('name') or row.get('resource_name', f"Resource {count+1}"),
                     resource_type=ResourceType(row.get('resource_type', 'material').lower()),
                     status=ResourceStatus(row.get('status', 'available').lower()),
-                    quantity=float(row.get('quantity', 0)),
+                    quantity=float(row.get('quantity', 0)), #??
                     unit=row.get('unit', 'units'),
-                    unit_cost=float(row.get('unit_cost', 0)),
+                    unit_cost=float(row.get('unit_cost', 0)),#??
                     supplier=row.get('supplier', '')
                 )
                 resource.calculate_total_cost()

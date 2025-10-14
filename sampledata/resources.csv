@@ -1,0 +1,5 @@
+project_id,resource_name,resource_type,status,quantity,unit,unit_cost,supplier
+1,solar panels,material,active,1200,units,250,greenlight corp
+1,installation crew,human,in use,10,people,0,brightworks ltd
+2,ai servers,equipment,ordered,5,units,8000,neuralcore gmbh
+3,marine crane,equipment,retired,2,units,150000,oceanlift inc

@@ -1,0 +1,4 @@
+project_name,description,status,start_date,end_date,total_budget,spent_amount,location
+solar farm alpha,development of a 50mw solar plant,active,2025-01-10,2026-03-20,5000000,1200000,nevada
+smart city grid,ai-driven urban energy optimization,on hold,2024-05-01,2025-12-31,8000000,3500000,berlin
+coastal wind initiative,offshore wind turbine installation,completed,2023-03-15,2024-07-30,10000000,9800000,copenhagen

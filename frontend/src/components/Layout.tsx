@@ -25,7 +25,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 to="/"
                 className="flex-shrink-0 text-white text-xl font-bold"
               >
-                🏗️ BuildFlow ERP
+                BuildFlow
               </Link>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">

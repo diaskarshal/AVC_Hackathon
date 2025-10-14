@@ -13,7 +13,7 @@ const Navbar: React.FC = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
-          🏗️ BuildFlow
+          BuildFlow
         </Link>
         <ul className="navbar-menu">
           <li>

@@ -1,0 +1,5 @@
+project_id,task_name,description,status,priority,start_date,end_date,progress,assigned_to
+1,site survey,initial geological and solar exposure study,completed,high,2025-01-12,2025-02-05,100,lee
+1,foundation setup,build panel foundations,in progress,medium,2025-03-01,2025-05-15,45,chen
+2,data pipeline design,create data ingestion for city sensors,active,high,2024-07-10,2025-01-31,60,maria
+3,turbine maintenance,final inspection before handover,completed,low,2024-06-01,2024-07-15,100,amir
