@@ -215,7 +215,11 @@ const Dashboard: React.FC = () => {
         <CardBody>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Link
-              to="/projects/new"
+              to="/projects"
+              onClick={() => {
+                // Signal to open the create modal
+                window.dispatchEvent(new CustomEvent('openProjectModal'));
+              }}
               className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
             >
               Create New Project

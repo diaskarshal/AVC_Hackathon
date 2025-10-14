@@ -146,13 +146,13 @@ docker-compose exec db psql -U buildflow -d buildflow_db
 ## Excel/CSV Import Format
 
 ### Projects Sheet/CSV
-- name, description, status, start_date, end_date, total_budget, spent_amount, location
+- name (or project_name), description, status, start_date, end_date, total_budget, spent_amount, location
 
 ### Tasks Sheet/CSV
-- project_id, name, description, status, priority, start_date, end_date, progress, assigned_to
+- project_id OR project_name, name (or task_name), description, status, priority, start_date, end_date, progress, assigned_to
 
 ### Resources Sheet/CSV
-- project_id, name, resource_type, status, quantity, unit, unit_cost, supplier
+- project_id OR project_name, name (or resource_name), resource_type, status, quantity, unit, unit_cost, supplier
 
 ### Budgets Sheet/CSV
-- project_id, category, description, planned_amount, actual_amount
+- project_id OR project_name, category, description, planned_amount, actual_amount

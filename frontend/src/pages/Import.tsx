@@ -209,24 +209,24 @@ const Import: React.FC = () => {
                 Create separate sheets for each data type:
               </p>
               <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                <li>
-                  <strong>Projects:</strong> name, description, status,
-                  start_date, end_date, total_budget, spent_amount, location
-                </li>
-                <li>
-                  <strong>Tasks:</strong> project_id, name, description,
-                  status, priority, start_date, end_date, progress,
-                  assigned_to
-                </li>
-                <li>
-                  <strong>Resources:</strong> project_id, name,
-                  resource_type, status, quantity, unit, unit_cost, supplier
-                </li>
-                <li>
-                  <strong>Budgets:</strong> project_id, category,
-                  description, planned_amount, actual_amount
-                </li>
-              </ul>
+              <li>
+                <strong>Projects:</strong> name (or project_name), description, status,
+                start_date, end_date, total_budget, spent_amount, location
+              </li>
+              <li>
+                <strong>Tasks:</strong> project_id OR project_name, name (or task_name), description,
+                status, priority, start_date, end_date, progress,
+                assigned_to
+              </li>
+              <li>
+                <strong>Resources:</strong> project_id OR project_name, name (or resource_name),
+                resource_type, status, quantity, unit, unit_cost, supplier
+              </li>
+              <li>
+                <strong>Budgets:</strong> project_id OR project_name, category,
+                description, planned_amount, actual_amount
+              </li>
+            </ul>
             </div>
 
             <div>
