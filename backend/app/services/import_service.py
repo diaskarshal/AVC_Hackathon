@@ -50,46 +50,42 @@ class ImportService:
             self.db.rollback()
             raise Exception(f"Error importing Excel: {str(e)}")
     
-    def _import_tasks(self, df: pd.DataFrame) -> int:
-        """Import tasks from dataframe"""
-        count = 0
-        df.columns = df.columns.str.strip().str.lower()
+    def import_from_csv(self, file_content: bytes) -> Dict:
+        try:
+            df = None
+            for delimiter in [',', ';', '\t']:
+                try:
+                    df = pd.read_csv(BytesIO(file_content), delimiter=delimiter)
+                    if len(df.columns) > 1:
+                        break
+                except:
+                    continue
+            
+            if df is None or len(df.columns) <= 1:
+                raise Exception("Unable to parse CSV file")
+            
+            df.columns = df.columns.str.strip().str.lower()
+            columns = set(df.columns)
+            
+            # Detect data type based on columns
+            if 'project_name' in columns or ('name' in columns and 'total_budget' in columns):
+                count = self._import_projects(df)
+                return {"projects": count, "tasks": 0, "resources": 0, "budgets": 0}
+            elif 'task_name' in columns or ('project_id' in columns and 'assigned_to' in columns):
+                count = self._import_tasks(df)
+                return {"projects": 0, "tasks": count, "resources": 0, "budgets": 0}
+            elif 'resource_name' in columns or 'resource_type' in columns:
+                count = self._import_resources(df)
+                return {"projects": 0, "tasks": 0, "resources": count, "budgets": 0}
+            elif 'category' in columns and 'planned_amount' in columns:
+                count = self._import_budgets(df)
+                return {"projects": 0, "tasks": 0, "resources": 0, "budgets": count}
+            else:
+                raise Exception(f"Unable to determine CSV data type. Columns found: {', '.join(columns)}")
         
-        for _, row in df.iterrows():
-            try:
-                name = row.get('name') or row.get('task_name', f"Task {count+1}")
-                
-                # Handle project_id - try to find by name first
-                project_id = None
-                if 'project_name' in row and pd.notna(row.get('project_name')):
-                    project = self.db.query(Project).filter(
-                        Project.name == str(row['project_name'])
-                    ).first()
-                    if project:
-                        project_id = project.id
-                
-                if project_id is None:
-                    project_id = int(row.get('project_id', 1))
-                
-                task = Task(
-                    project_id=project_id,
-                    name=str(name),
-                    description=str(row.get('description', '')),
-                    status=self._parse_task_status(row.get('status', 'not_started')),
-                    priority=self._parse_task_priority(row.get('priority', 'medium')),
-                    start_date=pd.to_datetime(row.get('start_date')) if pd.notna(row.get('start_date')) else None,
-                    planned_end_date=pd.to_datetime(row.get('end_date') or row.get('planned_end_date')) if pd.notna(row.get('end_date') or row.get('planned_end_date')) else None,
-                    progress_percentage=float(row.get('progress') or row.get('progress_percentage', 0)),
-                    assigned_to=str(row.get('assigned_to', ''))
-                )
-                self.db.add(task)
-                count += 1
-            except Exception as e:
-                print(f"Error importing task row: {e}")
-                continue
-        
-        self.db.commit()
-        return count
+        except Exception as e:
+            self.db.rollback()
+            raise Exception(f"Error importing CSV: {str(e)}")
     
     def _import_projects(self, df: pd.DataFrame) -> int:
         """Import projects from dataframe"""
@@ -156,22 +152,11 @@ class ImportService:
         
         for _, row in df.iterrows():
             try:
+                # Handle different column name variations
                 name = row.get('name') or row.get('resource_name', f"Resource {count+1}")
                 
-                # Handle project_id - try to find by name first
-                project_id = None
-                if 'project_name' in row and pd.notna(row.get('project_name')):
-                    project = self.db.query(Project).filter(
-                        Project.name == str(row['project_name'])
-                    ).first()
-                    if project:
-                        project_id = project.id
-                
-                if project_id is None:
-                    project_id = int(row.get('project_id', 1))
-                
                 resource = Resource(
-                    project_id=project_id,
+                    project_id=int(row.get('project_id', 1)),
                     name=str(name),
                     resource_type=self._parse_resource_type(row.get('resource_type', 'material')),
                     status=self._parse_resource_status(row.get('status', 'available')),
@@ -197,20 +182,8 @@ class ImportService:
         
         for _, row in df.iterrows():
             try:
-                # Handle project_id - try to find by name first
-                project_id = None
-                if 'project_name' in row and pd.notna(row.get('project_name')):
-                    project = self.db.query(Project).filter(
-                        Project.name == str(row['project_name'])
-                    ).first()
-                    if project:
-                        project_id = project.id
-                
-                if project_id is None:
-                    project_id = int(row.get('project_id', 1))
-                
                 budget = Budget(
-                    project_id=project_id,
+                    project_id=int(row.get('project_id', 1)),
                     category=str(row.get('category', 'General')),
                     description=str(row.get('description', '')),
                     planned_amount=float(row.get('planned_amount', 0)),
