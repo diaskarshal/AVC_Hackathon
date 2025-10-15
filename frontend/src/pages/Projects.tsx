@@ -53,21 +53,38 @@ const Projects: React.FC = () => {
 }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const submitData = {
+      const submitData: any = {
         ...formData,
         total_budget: parseFloat(formData.total_budget.toString()),
-        start_date: formData.start_date ? new Date(formData.start_date).toISOString() : undefined,
-        planned_end_date: formData.planned_end_date ? new Date(formData.planned_end_date).toISOString() : undefined,
       };
+
+      // Only include dates if they are valid
+      if (formData.start_date) {
+        try {
+          submitData.start_date = new Date(formData.start_date).toISOString();
+        } catch (err) {
+          console.error("Invalid start_date:", err);
+        }
+      }
+      
+      if (formData.planned_end_date) {
+        try {
+          submitData.planned_end_date = new Date(
+            formData.planned_end_date
+          ).toISOString();
+        } catch (err) {
+          console.error("Invalid planned_end_date:", err);
+        }
+      }
 
       if (editingProject) {
         await projectsAPI.update(editingProject.id, submitData);
@@ -78,7 +95,9 @@ const Projects: React.FC = () => {
       resetForm();
       fetchProjects();
     } catch (err: any) {
-      alert(err.response?.data?.detail || err.message || "Failed to save project");
+      alert(
+        err.response?.data?.detail || err.message || "Failed to save project"
+      );
     }
   };
 

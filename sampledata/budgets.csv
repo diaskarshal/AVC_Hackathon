@@ -1,5 +1,5 @@
-project_id,category,description,planned_amount,actual_amount
-1,materials,solar panels and wiring,1500000,1200000
-1,labor,installation and supervision,700000,450000
-2,software,ai analytics and cloud infra,2000000,1750000
-3,logistics,transport and offshore support,900000,950000
+project_name,category,description,planned_amount,actual_amount
+solar farm alpha,materials,solar panels and wiring,1500000,1200000
+solar farm alpha,labor,installation and supervision,700000,450000
+smart city grid,software,ai analytics and cloud infra,2000000,1750000
+coastal wind initiative,logistics,transport and offshore support,900000,950000
