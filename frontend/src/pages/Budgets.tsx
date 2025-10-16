@@ -12,6 +12,7 @@ import Modal from "../components/Modal";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import TextArea from "../components/TextArea";
+import { exportToCSV } from '../utils/export';
 import { budgetsAPI, projectsAPI, Budget, Project } from "../services/API";
 
 const Budgets: React.FC = () => {
@@ -115,6 +116,22 @@ const Budgets: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleExport = () => {
+    const exportData = filteredBudgets.map((budget) => ({
+      ID: budget.id,
+      "Project ID": budget.project_id,
+      Category: budget.category,
+      Description: budget.description || "N/A",
+      "Planned Amount": budget.planned_amount,
+      "Actual Amount": budget.actual_amount,
+      Variance: budget.variance,
+      "Variance %": budget.variance_percentage.toFixed(2),
+      Date: new Date(budget.budget_date).toLocaleDateString(),
+    }));
+
+    exportToCSV(exportData, "budgets");
+  };
+
   const resetForm = () => {
     setFormData({
       project_id: "",
@@ -178,9 +195,14 @@ const Budgets: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
-        <Button onClick={() => setIsModalOpen(true)}>
-          Add Budget Entry
-        </Button>
+        <div className="flex space-x-3">
+          <Button variant="secondary" onClick={handleExport}>
+            📥 Export
+          </Button>
+          <Button onClick={() => setIsModalOpen(true)}>
+            Add Budget Entry
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}

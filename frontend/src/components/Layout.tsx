@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import UserMenu from "./UserMenu";
+import Notifications from "./Notifications";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,7 +29,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: "/tasks", label: "Tasks" },
         { path: "/resources", label: "Resources" },
         { path: "/budgets", label: "Budgets" },
-        { path: "/import", label: "Import Data" },
+        { path: "/team-performance", label: "Team" },
+        { path: "/users", label: "Users" },
+        { path: "/import", label: "Import" },
       ];
     } else if (user.role === "manager") {
       return [
@@ -37,6 +40,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: "/tasks", label: "Tasks" },
         { path: "/resources", label: "Resources" },
         { path: "/budgets", label: "Budgets" },
+        { path: "/team-performance", label: "Team" },
       ];
     } else {
       // worker
@@ -50,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navLinks = getNavigationLinks();
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="flex items-center justify-between h-16">
       {/* Navigation */}
       <nav className="bg-primary-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,7 +80,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
               </div>
             </div>
-            <UserMenu />
+            {/* !!!!!!!!!!!!!!!!!! */}
+            <div className="flex items-center space-x-4">
+              <Notifications />
+              <UserMenu />
+            </div>
           </div>
         </div>
       </nav>

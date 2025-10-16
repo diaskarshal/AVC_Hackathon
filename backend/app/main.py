@@ -68,6 +68,7 @@ from app.config import settings
 from app.database import init_db
 from app.routes import (
     auth,
+    users,
     projects,
     resources,
     tasks,
@@ -102,7 +103,7 @@ app.add_middleware(
 add_exception_handlers(app)
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-
+app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(projects.router, prefix="/api/projects", tags=["Projects"])
 app.include_router(tasks.router, prefix="/api/tasks", tags=["Tasks"])
 app.include_router(

@@ -6,27 +6,47 @@ from app.auth.dependencies import get_current_user
 
 router = APIRouter()
 
-
 @router.get("/dashboard")
 async def get_dashboard_stats(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get dashboard stats filtered by role"""
     service = AnalyticsService(db)
-    stats = service.get_dashboard_stats()
     
-    # Filter stats based on role
     if current_user["role"] == "manager":
-        # Get stats only for managed projects
         managed_projects = current_user.get("managed_projects", [])
         stats = service.get_manager_dashboard_stats(managed_projects)
     elif current_user["role"] == "worker":
-        # Get worker-specific stats
         worker_name = current_user.get("worker_name")
         stats = service.get_worker_dashboard_stats(worker_name)
+    else:
+        stats = service.get_dashboard_stats()
     
     return stats
+
+
+@router.get("/team-performance")
+async def get_team_performance(
+    project_id: int = None,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if current_user["role"] == "worker":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Workers cannot access team performance data"
+        )
+    
+    if current_user["role"] == "manager" and project_id:
+        managed_projects = current_user.get("managed_projects", [])
+        if project_id not in managed_projects:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this project"
+            )
+    
+    service = AnalyticsService(db)
+    return service.get_team_performance(project_id)
 
 
 @router.get("/project/{project_id}/kpi")
@@ -35,8 +55,6 @@ async def get_project_kpi(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get project KPI with role-based access"""
-    # Check permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if project_id not in managed_projects:

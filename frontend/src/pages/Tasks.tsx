@@ -6,6 +6,7 @@ import Modal from "../components/Modal";
 import Input from "../components/Input";
 import Select from "../components/Select";
 import TextArea from "../components/TextArea";
+import { exportToCSV } from '../utils/export';
 import { tasksAPI, projectsAPI, Task, Project } from "../services/API";
 
 const Tasks: React.FC = () => {
@@ -112,6 +113,27 @@ const Tasks: React.FC = () => {
     }
   };
 
+  const handleExport = () => {
+    const exportData = filteredTasks.map((task) => ({
+      ID: task.id,
+      "Project ID": task.project_id,
+      Name: task.name,
+      Status: task.status,
+      Priority: task.priority,
+      "Assigned To": task.assigned_to || "Unassigned",
+      "Start Date": task.start_date
+        ? new Date(task.start_date).toLocaleDateString()
+        : "N/A",
+      "End Date": task.planned_end_date
+        ? new Date(task.planned_end_date).toLocaleDateString()
+        : "N/A",
+      "Progress %": task.progress_percentage,
+      Overdue: task.is_overdue ? "Yes" : "No",
+    }));
+
+    exportToCSV(exportData, "tasks");
+  };
+
   const openEditModal = (task: Task) => {
     setEditingTask(task);
     setFormData({
@@ -193,13 +215,24 @@ const Tasks: React.FC = () => {
     );
   }
 
+  // return (
+  //   <div className="space-y-6">
+  //     <div className="flex justify-between items-center">
+  //       <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+  //       <Button onClick={() => setIsModalOpen(true)}>
+  //         Create New Task
+  //       </Button>
+  //     </div>
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-        <Button onClick={() => setIsModalOpen(true)}>
-          Create New Task
-        </Button>
+        <div className="flex space-x-3">
+          <Button variant="secondary" onClick={handleExport}>
+            📥 Export
+          </Button>
+          <Button onClick={() => setIsModalOpen(true)}>Add New Task</Button>
+        </div>
       </div>
 
       {/* Summary Cards */}

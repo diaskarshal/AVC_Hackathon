@@ -175,6 +175,26 @@ const Projects: React.FC = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const handleExport = () => {
+    const exportData = projects.map((project) => ({
+      ID: project.id,
+      Name: project.name,
+      Status: project.status,
+      "Start Date": project.start_date
+        ? new Date(project.start_date).toLocaleDateString()
+        : "N/A",
+      "End Date": project.planned_end_date
+        ? new Date(project.planned_end_date).toLocaleDateString()
+        : "N/A",
+      "Total Budget": project.total_budget,
+      "Spent Amount": project.spent_amount,
+      "Budget Utilization %": project.budget_utilization.toFixed(2),
+      Location: project.location || "N/A",
+    }));
+
+    exportToCSV(exportData, "projects");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -191,30 +211,43 @@ const Projects: React.FC = () => {
     );
   }
 
+  // return (
+  //   <div className="space-y-6">
+  //     <div className="flex justify-between items-center">
+  //       <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
+  //       <div className="flex gap-2">
+  //         <Button 
+  //           variant="secondary" 
+  //           onClick={() => {
+  //             const exportData = projects.map(p => ({
+  //               name: p.name,
+  //               description: p.description,
+  //               status: p.status,
+  //               start_date: p.start_date,
+  //               planned_end_date: p.planned_end_date,
+  //               total_budget: p.total_budget,
+  //               spent_amount: p.spent_amount,
+  //               location: p.location
+  //             }));
+  //             exportToCSV(exportData, 'projects');
+  //           }}
+  //         >
+  //           Export CSV
+  //         </Button>
+  //         <Button onClick={openCreateModal}>New Project</Button>
+  //       </div>
+  //     </div>
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-        <div className="flex gap-2">
-          <Button 
-            variant="secondary" 
-            onClick={() => {
-              const exportData = projects.map(p => ({
-                name: p.name,
-                description: p.description,
-                status: p.status,
-                start_date: p.start_date,
-                planned_end_date: p.planned_end_date,
-                total_budget: p.total_budget,
-                spent_amount: p.spent_amount,
-                location: p.location
-              }));
-              exportToCSV(exportData, 'projects');
-            }}
-          >
-            Export CSV
+        <div className="flex space-x-3">
+          <Button variant="secondary" onClick={handleExport}>
+            📥 Export
           </Button>
-          <Button onClick={openCreateModal}>New Project</Button>
+          <Button onClick={() => setIsModalOpen(true)}>
+            Add New Project
+          </Button>
         </div>
       </div>
 

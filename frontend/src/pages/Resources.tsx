@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import Modal from "../components/Modal";
 import Input from "../components/Input";
 import Select from "../components/Select";
+import { exportToCSV } from '../utils/export';
 import { resourcesAPI, projectsAPI, Resource, Project } from "../services/API";
 
 const Resources: React.FC = () => {
@@ -96,6 +97,24 @@ const Resources: React.FC = () => {
     }
   };
 
+  const handleExport = () => {
+    const exportData = filteredResources.map((resource) => ({
+      ID: resource.id,
+      "Project ID": resource.project_id,
+      Name: resource.name,
+      Type: resource.resource_type,
+      Status: resource.status,
+      Quantity: resource.quantity,
+      Unit: resource.unit || "N/A",
+      "Unit Cost": resource.unit_cost,
+      "Total Cost": resource.total_cost,
+      Supplier: resource.supplier || "N/A",
+      "Allocated Date": new Date(resource.allocated_date).toLocaleDateString(),
+    }));
+
+    exportToCSV(exportData, "resources");
+  };
+
   const openEditModal = (resource: Resource) => {
     setEditingResource(resource);
     setFormData({
@@ -180,9 +199,14 @@ const Resources: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Resources</h1>
-        <Button onClick={() => setIsModalOpen(true)}>
-          Add New Resource
-        </Button>
+        <div className="flex space-x-3">
+          <Button variant="secondary" onClick={handleExport}>
+            📥 Export
+          </Button>
+          <Button onClick={() => setIsModalOpen(true)}>
+            Add New Resource
+          </Button>
+        </div>
       </div>
 
       {/* Summary Cards */}

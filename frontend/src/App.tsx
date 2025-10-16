@@ -10,6 +10,9 @@ import Tasks from "./pages/Tasks";
 import Resources from "./pages/Resources";
 import Budgets from "./pages/Budgets";
 import Import from "./pages/Import";
+import Users from "./pages/Users";
+import Profile from "./pages/Profile";
+import TeamPerformance from "./pages/TeamPerformance";
 
 function App() {
   return (
@@ -30,6 +33,16 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Layout>
+                  <Users />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
 
           {/* Manager Routes */}
           <Route
@@ -38,6 +51,16 @@ function App() {
               <PrivateRoute allowedRoles={["manager"]}>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/team-performance"
+            element={
+              <PrivateRoute allowedRoles={["admin", "manager"]}>
+                <Layout>
+                  <TeamPerformance />
                 </Layout>
               </PrivateRoute>
             }
@@ -112,6 +135,17 @@ function App() {
               <PrivateRoute allowedRoles={["admin"]}>
                 <Layout>
                   <Import />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute allowedRoles={["admin", "manager", "worker"]}>
+                <Layout>
+                  <Profile />
                 </Layout>
               </PrivateRoute>
             }

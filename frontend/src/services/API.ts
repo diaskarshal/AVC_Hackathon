@@ -113,6 +113,31 @@ export interface DashboardStats {
   task_completion_rate: number;
 }
 
+export interface TeamMember {
+  username: string;
+  role: string;
+  name: string;
+  email: string;
+  worker_name?: string;
+  managed_projects?: number[];
+}
+
+export interface TeamPerformance {
+  worker_name: string;
+  total_tasks: number;
+  completed_tasks: number;
+  avg_progress: number;
+  completion_rate: number;
+}
+
+export interface ActivityLog {
+  id: number;
+  user: string;
+  action: string;
+  timestamp: string;
+  details: string;
+}
+
 // Projects
 export const projectsAPI = {
   getAll: () => api.get<Project[]>("/api/projects/"),
@@ -164,25 +189,34 @@ export const budgetsAPI = {
   delete: (id: number) => api.delete(`/api/budgets/${id}`),
 };
 
-// Analytics
+export const usersAPI = {
+  getAll: () => api.get<TeamMember[]>("/api/users/"),
+  getProfile: () => api.get<TeamMember>("/api/users/profile"),
+  updateProfile: (data: Partial<TeamMember>) =>
+    api.put<TeamMember>("/api/users/profile", data),
+  getTeam: () => api.get<TeamMember[]>("/api/users/team"),
+  getActivityLog: (limit: number = 50) =>
+    api.get<ActivityLog[]>(`/api/users/activity-log?limit=${limit}`),
+};
+
 export const analyticsAPI = {
-  getDashboard: () =>
-    api.get<DashboardStats>("/api/analytics/dashboard"),
+  getDashboard: () => api.get<DashboardStats>("/api/analytics/dashboard"),
   getProjectKPI: (projectId: number) =>
     api.get(`/api/analytics/project/${projectId}/kpi`),
   getBudgetBreakdown: (projectId: number) =>
     api.get(`/api/analytics/project/${projectId}/budget-breakdown`),
   getResourceDistribution: (projectId: number) =>
-    api.get(
-      `/api/analytics/project/${projectId}/resource-distribution`
-    ),
+    api.get(`/api/analytics/project/${projectId}/resource-distribution`),
   getTimeline: (projectId: number) =>
     api.get(`/api/analytics/project/${projectId}/timeline`),
   predictCompletion: (projectId: number) =>
     api.get(`/api/analytics/project/${projectId}/predict-completion`),
+  getTeamPerformance: (projectId?: number) =>
+    api.get<{ team_members: number; performance: TeamPerformance[] }>(
+      `/api/analytics/team-performance${projectId ? `?project_id=${projectId}` : ""}`
+    ),
 };
 
-// Import
 export const importAPI = {
   uploadExcel: (file: File) => {
     const formData = new FormData();
@@ -213,5 +247,7 @@ export const authAPI = {
     }),
   getDemoUsers: () => api.get("/api/auth/demo-users"),
 };
+
+
 
 export default api;

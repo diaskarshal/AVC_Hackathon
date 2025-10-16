@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
@@ -52,6 +53,16 @@ const UserMenu: React.FC = () => {
               </div>
               <div className="text-xs text-gray-500">{user.email}</div>
             </div>
+            
+            {/* ADD PROFILE LINK */}
+            <Link
+              to="/profile"
+              onClick={() => setIsOpen(false)}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              My Profile
+            </Link>
+            
             <button
               onClick={logout}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
