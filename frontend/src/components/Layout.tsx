@@ -1,5 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import UserMenu from "./UserMenu";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,12 +9,45 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const isActive = (path: string) => {
     return location.pathname === path
       ? "bg-primary-700 text-white"
       : "text-gray-300 hover:bg-primary-700 hover:text-white";
   };
+
+  // Different navigation based on role
+  const getNavigationLinks = () => {
+    if (!user) return [];
+
+    if (user.role === "admin") {
+      return [
+        { path: "/admin/dashboard", label: "Dashboard" },
+        { path: "/projects", label: "Projects" },
+        { path: "/tasks", label: "Tasks" },
+        { path: "/resources", label: "Resources" },
+        { path: "/budgets", label: "Budgets" },
+        { path: "/import", label: "Import Data" },
+      ];
+    } else if (user.role === "manager") {
+      return [
+        { path: "/manager/dashboard", label: "Dashboard" },
+        { path: "/projects", label: "Projects" },
+        { path: "/tasks", label: "Tasks" },
+        { path: "/resources", label: "Resources" },
+        { path: "/budgets", label: "Budgets" },
+      ];
+    } else {
+      // worker
+      return [
+        { path: "/worker/dashboard", label: "Dashboard" },
+        { path: "/worker/my-tasks", label: "My Tasks" },
+      ];
+    }
+  };
+
+  const navLinks = getNavigationLinks();
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -29,45 +64,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
-                  <Link
-                    to="/"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/")}`}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/projects"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/projects")}`}
-                  >
-                    Projects
-                  </Link>
-                  <Link
-                    to="/tasks"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/tasks")}`}
-                  >
-                    Tasks
-                  </Link>
-                  <Link
-                    to="/resources"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/resources")}`}
-                  >
-                    Resources
-                  </Link>
-                  <Link
-                    to="/budgets"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/budgets")}`}
-                  >
-                    Budgets
-                  </Link>
-                  <Link
-                    to="/import"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${isActive("/import")}`}
-                  >
-                    Import Data
-                  </Link>
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`px-3 py-2 rounded-md text-sm font-medium ${isActive(link.path)}`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
+            <UserMenu />
           </div>
         </div>
       </nav>

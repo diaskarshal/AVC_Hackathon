@@ -10,25 +10,24 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.import_service import ImportService
 from app.config import settings
+from app.auth.dependencies import require_role
 
 router = APIRouter()
 
 
-@router.post("/excel")
+@router.post("/excel", dependencies=[Depends(require_role("admin"))])
 async def import_from_excel(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
-    # use the property instead
+    """Import from Excel - admin only"""
     if not any(
-        file.filename.endswith(ext)
-        for ext in settings.allowed_extensions_set
+        file.filename.endswith(ext) for ext in settings.allowed_extensions_set
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid file type. Allowed: {', '.join(settings.allowed_extensions_set)}",
         )
     
-    # Validate file size
     contents = await file.read()
     if len(contents) > settings.MAX_UPLOAD_SIZE:
         raise HTTPException(
@@ -47,10 +46,11 @@ async def import_from_excel(
         )
 
 
-@router.post("/csv")
+@router.post("/csv", dependencies=[Depends(require_role("admin"))])
 async def import_from_csv(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
+    """Import from CSV - admin only"""
     if not file.filename.endswith(".csv"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -1,13 +1,7 @@
 # BuildFlow ERP System
 todo:
 - implement create new project button in the dashboard;
-- fix the "Spent: " entry in the project modal; 
-- strange behaviour in projects tab: previously added projects are not shown unless one of the shown projects in the projects tab is updated; new added projects are not shown;
 - add export button to project(s)/task(s)/resource(s)/budget(s) tab;
-- fix import csv files
-    - the output after "upload and import" shows redundant info (when importing tasks, all others are also shown with 0s).
-    - the import files must be in the correct order, first should be project.csv, because if not, other table entries(tasks, budgets, resources) will use from the existing project name entries;
-    - the update of the resource that was imported as said previously does not work. it does not update to the existing project that was imported later, it still chooses the old one.
 
 BuildFlow is a ERP system for construction project management.
 

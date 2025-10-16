@@ -178,3 +178,93 @@ class AnalyticsService:
             "cost_overrun": round(predicted_cost - project.total_budget, 2),
             "confidence": "medium" if completed > 3 else "low"
         }
+    def get_manager_dashboard_stats(self, managed_project_ids: List[int]) -> Dict:
+        """Get dashboard stats filtered for manager's projects"""
+        if not managed_project_ids:
+            return {
+                "total_projects": 0,
+                "active_projects": 0,
+                "completed_projects": 0,
+                "total_budget": 0,
+                "total_spent": 0,
+                "budget_utilization": 0,
+                "total_tasks": 0,
+                "completed_tasks": 0,
+                "overdue_tasks": 0,
+                "task_completion_rate": 0
+            }
+        
+        total_projects = self.db.query(Project).filter(
+            Project.id.in_(managed_project_ids)
+        ).count()
+        
+        active_projects = self.db.query(Project).filter(
+            Project.id.in_(managed_project_ids),
+            Project.status == ProjectStatus.IN_PROGRESS
+        ).count()
+        
+        total_budget = self.db.query(func.sum(Project.total_budget)).filter(
+            Project.id.in_(managed_project_ids)
+        ).scalar() or 0
+        
+        total_spent = self.db.query(func.sum(Project.spent_amount)).filter(
+            Project.id.in_(managed_project_ids)
+        ).scalar() or 0
+        
+        total_tasks = self.db.query(Task).filter(
+            Task.project_id.in_(managed_project_ids)
+        ).count()
+        
+        completed_tasks = self.db.query(Task).filter(
+            Task.project_id.in_(managed_project_ids),
+            Task.status == TaskStatus.COMPLETED
+        ).count()
+        
+        overdue_tasks = self.db.query(Task).filter(
+            Task.project_id.in_(managed_project_ids),
+            Task.status != TaskStatus.COMPLETED,
+            Task.planned_end_date < datetime.utcnow()
+        ).count()
+    
+    def get_worker_dashboard_stats(self, worker_name: str) -> Dict:
+        """Get dashboard stats for a specific worker"""
+        total_tasks = self.db.query(Task).filter(
+            Task.assigned_to == worker_name
+        ).count()
+        
+        completed_tasks = self.db.query(Task).filter(
+            Task.assigned_to == worker_name,
+            Task.status == TaskStatus.COMPLETED
+        ).count()
+        
+        in_progress_tasks = self.db.query(Task).filter(
+            Task.assigned_to == worker_name,
+            Task.status == TaskStatus.IN_PROGRESS
+        ).count()
+        
+        overdue_tasks = self.db.query(Task).filter(
+            Task.assigned_to == worker_name,
+            Task.status != TaskStatus.COMPLETED,
+            Task.planned_end_date < datetime.utcnow()
+        ).count()
+        
+        # Tasks due in next 7 days
+        upcoming_deadline = datetime.utcnow() + timedelta(days=7)
+        upcoming_tasks = self.db.query(Task).filter(
+            Task.assigned_to == worker_name,
+            Task.status != TaskStatus.COMPLETED,
+            Task.planned_end_date.between(datetime.utcnow(), upcoming_deadline)
+        ).count()
+        
+        return {
+            "total_tasks": total_tasks,
+            "completed_tasks": completed_tasks,
+            "in_progress_tasks": in_progress_tasks,
+            "not_started_tasks": self.db.query(Task).filter(
+                Task.assigned_to == worker_name,
+                Task.status == TaskStatus.NOT_STARTED
+            ).count(),
+            "overdue_tasks": overdue_tasks,
+            "upcoming_tasks": upcoming_tasks,
+            "task_completion_rate": round((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0, 2)
+        }

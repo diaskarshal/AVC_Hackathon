@@ -10,6 +10,32 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 export interface Project {
   id: number;
   name: string;
@@ -176,6 +202,16 @@ export const importAPI = {
       },
     });
   },
+};
+
+export const authAPI = {
+  login: (credentials: { username: string; password: string }) =>
+    api.post("/api/auth/login", credentials),
+  getCurrentUser: (token: string) =>
+    api.get("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+  getDemoUsers: () => api.get("/api/auth/demo-users"),
 };
 
 export default api;
