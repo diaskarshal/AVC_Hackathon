@@ -1,8 +1,6 @@
 # BuildFlow ERP System
 todo:
-- implement create new project button in the dashboard;
-- add export button to project(s)/task(s)/resource(s)/budget(s) tab;
-
+- workers should be shown the tasks their team assigned to, not the whole tasks.
 BuildFlow is a ERP system for construction project management.
 
 ## Features
