@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Card, CardHeader, CardBody } from "../components/Card";
-import { analyticsAPI, DashboardStats } from "../services/API";
+import { analyticsAPI, DashboardStats, WorkerStats } from "../services/API";
 import { useAuth } from "../contexts/AuthContext";
 import AdminDashboard from "../components/dashboards/AdminDashboard";
 import ManagerDashboard from "../components/dashboards/ManagerDashboard";
@@ -9,7 +7,9 @@ import WorkerDashboard from "../components/dashboards/WorkerDashboard";
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [stats, setStats] = useState<DashboardStats | WorkerStats | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,13 +48,27 @@ const Dashboard: React.FC = () => {
 
   if (!stats || !user) return null;
 
-  // Render role-specific dashboard
   if (user.role === "admin") {
-    return <AdminDashboard stats={stats} onRefresh={fetchDashboard} />;
+    return (
+      <AdminDashboard
+        stats={stats as DashboardStats}
+        onRefresh={fetchDashboard}
+      />
+    );
   } else if (user.role === "manager") {
-    return <ManagerDashboard stats={stats} onRefresh={fetchDashboard} />;
+    return (
+      <ManagerDashboard
+        stats={stats as DashboardStats}
+        onRefresh={fetchDashboard}
+      />
+    );
   } else {
-    return <WorkerDashboard stats={stats} onRefresh={fetchDashboard} />;
+    return (
+      <WorkerDashboard
+        stats={stats as WorkerStats}
+        onRefresh={fetchDashboard}
+      />
+    );
   }
 };
 

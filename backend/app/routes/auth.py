@@ -57,15 +57,17 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
 @router.get("/demo-users")
 async def get_demo_users():
     """Get list of demo users for login page (for presentation purposes)"""
-    from app.auth.demo_users import DEMO_USERS
+    from app.auth.demo_users import DEMO_USERS, _DEMO_USER_PASSWORDS
     
     demo_info = []
     for username, user_data in DEMO_USERS.items():
+        # Get the actual password from the password dict
+        actual_password = _DEMO_USER_PASSWORDS.get(username, "")
         demo_info.append({
             "username": username,
             "role": user_data["role"],
             "name": user_data["name"],
-            "hint": f"Password: {username.split('worker')[0] if 'worker' in username else username}123"
+            "hint": f"Password: {actual_password}"
         })
     
     return demo_info

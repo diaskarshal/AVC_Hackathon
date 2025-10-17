@@ -138,6 +138,16 @@ export interface ActivityLog {
   details: string;
 }
 
+export interface WorkerStats {
+  total_tasks: number;
+  completed_tasks: number;
+  in_progress_tasks: number;
+  not_started_tasks: number;
+  overdue_tasks: number;
+  upcoming_tasks: number;
+  task_completion_rate: number;
+}
+
 // Projects
 export const projectsAPI = {
   getAll: () => api.get<Project[]>("/api/projects/"),

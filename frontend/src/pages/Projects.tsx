@@ -43,14 +43,14 @@ const Projects: React.FC = () => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-  const handleOpenModal = () => {
-    openCreateModal();
-  };
+//   useEffect(() => {
+//   const handleOpenModal = () => {
+//     openCreateModal();
+//   };
   
-  window.addEventListener('openProjectModal', handleOpenModal);
-  return () => window.removeEventListener('openProjectModal', handleOpenModal);
-}, []);
+//   window.addEventListener('openProjectModal', handleOpenModal);
+//   return () => window.removeEventListener('openProjectModal', handleOpenModal);
+// }, []);
 
   const handleInputChange = (
       e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>

@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "../services/API";
-import { User, AuthState, LoginCredentials } from "../types/auth";
+import { AuthState, LoginCredentials } from "../types/auth";
+// import { User, AuthState, LoginCredentials } from "../types/auth";
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;

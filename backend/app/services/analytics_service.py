@@ -387,11 +387,13 @@ class AnalyticsService:
 
     def get_team_performance(self, project_id: int = None) -> Dict:
         """Get team performance metrics"""
+        from sqlalchemy import case
+        
         query = self.db.query(
             Task.assigned_to,
             func.count(Task.id).label("total_tasks"),
             func.sum(
-                func.case(
+                case(
                     (Task.status == TaskStatus.COMPLETED, 1),
                     else_=0
                 )

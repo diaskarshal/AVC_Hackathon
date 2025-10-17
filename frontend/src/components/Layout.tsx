@@ -18,7 +18,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       : "text-gray-300 hover:bg-primary-700 hover:text-white";
   };
 
-  // Different navigation based on role
   const getNavigationLinks = () => {
     if (!user) return [];
 
@@ -43,7 +42,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: "/team-performance", label: "Team" },
       ];
     } else {
-      // worker
       return [
         { path: "/worker/dashboard", label: "Dashboard" },
         { path: "/worker/my-tasks", label: "My Tasks" },
@@ -54,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navLinks = getNavigationLinks();
 
   return (
-    <div className="flex items-center justify-between h-16">
+    <div className="min-h-screen bg-gray-100">
       {/* Navigation */}
       <nav className="bg-primary-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,7 +70,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <Link
                       key={link.path}
                       to={link.path}
-                      className={`px-3 py-2 rounded-md text-sm font-medium ${isActive(link.path)}`}
+                      className={`px-3 py-2 rounded-md text-sm font-medium ${isActive(
+                        link.path
+                      )}`}
                     >
                       {link.label}
                     </Link>
@@ -80,7 +80,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
               </div>
             </div>
-            {/* !!!!!!!!!!!!!!!!!! */}
             <div className="flex items-center space-x-4">
               <Notifications />
               <UserMenu />

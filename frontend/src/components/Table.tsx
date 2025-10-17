@@ -56,14 +56,19 @@ export const TableHead: React.FC<TableHeadProps> = ({
 interface TableCellProps {
   children: React.ReactNode;
   className?: string;
+  colSpan?: number;
 }
 
 export const TableCell: React.FC<TableCellProps> = ({
   children,
   className = "",
+  colSpan,
 }) => {
   return (
-    <td className={`px-6 py-4 whitespace-nowrap text-sm ${className}`}>
+    <td
+      className={`px-6 py-4 whitespace-nowrap text-sm ${className}`}
+      colSpan={colSpan}
+    >
       {children}
     </td>
   );

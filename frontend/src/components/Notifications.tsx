@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { tasksAPI, Task } from "../services/API";
 
@@ -8,13 +8,7 @@ const Notifications: React.FC = () => {
   const [overdueTasks, setOverdueTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && user) {
-      fetchNotifications();
-    }
-  }, [isOpen, user]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -22,7 +16,6 @@ const Notifications: React.FC = () => {
       const response = await tasksAPI.getAll({});
       const tasks = response.data;
 
-      // Filter overdue tasks based on role
       let filtered = tasks.filter((task) => task.is_overdue);
 
       if (user.role === "worker") {
@@ -42,7 +35,13 @@ const Notifications: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isOpen && user) {
+      fetchNotifications();
+    }
+  }, [isOpen, user, fetchNotifications]);
 
   if (!user) return null;
 

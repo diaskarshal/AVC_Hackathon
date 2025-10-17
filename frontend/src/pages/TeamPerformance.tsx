@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardHeader, CardBody } from "../components/Card";
 import {
   Table,
@@ -22,13 +22,13 @@ const TeamPerformancePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  // useEffect(() => {
+  //   fetchProjects();
+  // }, []);
 
-  useEffect(() => {
-    fetchPerformance();
-  }, [selectedProject]);
+  // useEffect(() => {
+  //   fetchPerformance();
+  // }, [selectedProject]);
 
   const fetchProjects = async () => {
     try {
@@ -39,7 +39,7 @@ const TeamPerformancePage: React.FC = () => {
     }
   };
 
-  const fetchPerformance = async () => {
+    const fetchPerformance = useCallback(async () => {
     try {
       setLoading(true);
       const projectId = selectedProject ? parseInt(selectedProject) : undefined;
@@ -51,7 +51,15 @@ const TeamPerformancePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedProject]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    fetchPerformance();
+  }, [fetchPerformance]);
 
   const getPerformanceColor = (rate: number) => {
     if (rate >= 80) return "text-green-600";
