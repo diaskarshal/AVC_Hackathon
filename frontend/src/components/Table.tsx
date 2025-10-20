@@ -67,7 +67,7 @@ export const TableCell: React.FC<TableCellProps> = ({
   return (
     <td
       className={`px-6 py-4 whitespace-nowrap text-sm ${className}`}
-      colSpan={colSpan}
+      {...(colSpan && { colSpan })}
     >
       {children}
     </td>
