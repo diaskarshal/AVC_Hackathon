@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "../services/API";
 import { AuthState, LoginCredentials } from "../types/auth";
-// import { User, AuthState, LoginCredentials } from "../types/auth";
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -68,7 +67,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await authAPI.login(credentials);
       const { access_token, user } = response.data;
 
-      // Store in localStorage
       localStorage.setItem("token", access_token);
       localStorage.setItem("user", JSON.stringify(user));
 
@@ -79,7 +77,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading: false,
       });
 
-      // Redirect based on role
       if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else if (user.role === "manager") {

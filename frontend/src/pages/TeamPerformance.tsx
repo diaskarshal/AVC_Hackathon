@@ -22,14 +22,6 @@ const TeamPerformancePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   fetchProjects();
-  // }, []);
-
-  // useEffect(() => {
-  //   fetchPerformance();
-  // }, [selectedProject]);
-
   const fetchProjects = async () => {
     try {
       const response = await projectsAPI.getAll();

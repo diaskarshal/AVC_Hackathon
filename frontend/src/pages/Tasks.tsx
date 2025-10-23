@@ -215,14 +215,6 @@ const Tasks: React.FC = () => {
     );
   }
 
-  // return (
-  //   <div className="space-y-6">
-  //     <div className="flex justify-between items-center">
-  //       <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-  //       <Button onClick={() => setIsModalOpen(true)}>
-  //         Create New Task
-  //       </Button>
-  //     </div>
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

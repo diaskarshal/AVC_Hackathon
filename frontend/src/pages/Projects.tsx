@@ -43,15 +43,6 @@ const Projects: React.FC = () => {
       setLoading(false);
     }
   };
-//   useEffect(() => {
-//   const handleOpenModal = () => {
-//     openCreateModal();
-//   };
-  
-//   window.addEventListener('openProjectModal', handleOpenModal);
-//   return () => window.removeEventListener('openProjectModal', handleOpenModal);
-// }, []);
-
   const handleInputChange = (
       e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
     ) => {
@@ -211,32 +202,6 @@ const Projects: React.FC = () => {
     );
   }
 
-  // return (
-  //   <div className="space-y-6">
-  //     <div className="flex justify-between items-center">
-  //       <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-  //       <div className="flex gap-2">
-  //         <Button 
-  //           variant="secondary" 
-  //           onClick={() => {
-  //             const exportData = projects.map(p => ({
-  //               name: p.name,
-  //               description: p.description,
-  //               status: p.status,
-  //               start_date: p.start_date,
-  //               planned_end_date: p.planned_end_date,
-  //               total_budget: p.total_budget,
-  //               spent_amount: p.spent_amount,
-  //               location: p.location
-  //             }));
-  //             exportToCSV(exportData, 'projects');
-  //           }}
-  //         >
-  //           Export CSV
-  //         </Button>
-  //         <Button onClick={openCreateModal}>New Project</Button>
-  //       </div>
-  //     </div>
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">

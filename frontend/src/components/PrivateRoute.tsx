@@ -26,7 +26,6 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    // Redirect to appropriate dashboard
     if (user.role === "admin") {
       return <Navigate to="/admin/dashboard" replace />;
     } else if (user.role === "manager") {

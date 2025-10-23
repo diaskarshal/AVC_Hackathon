@@ -3,7 +3,6 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Store plain passwords for demo - hash on demand
 _DEMO_USER_PASSWORDS = {
     "admin": "admin123",
     "manager1": "manager123",
@@ -12,7 +11,6 @@ _DEMO_USER_PASSWORDS = {
     "worker3": "worker123",
 }
 
-# Hardcoded demo users for MVP presentation
 DEMO_USERS = {
     "admin": {
         "username": "admin",

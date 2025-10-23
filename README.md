@@ -8,6 +8,7 @@
 
 todo:
 - workers should be shown the tasks their team assigned to, not the whole tasks.
+- use patch(1 field - status) instead of put(updates all fields) in the workers' tasks update modal
 
 **BuildFlow** is a modern ERP system designed for construction project management, developed for AVC Group.
 

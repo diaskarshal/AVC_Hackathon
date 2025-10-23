@@ -74,7 +74,7 @@ const Import: React.FC = () => {
         </CardHeader>
         <CardBody className="space-y-4">
           <p className="text-sm text-gray-600">
-            Import projects, tasks, resources, and budget data from Excel or
+            Import projects(always first), tasks, resources, and budget data from Excel or
             CSV files. The file should contain sheets/columns matching the
             required format.
           </p>
