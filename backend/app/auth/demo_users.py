@@ -56,34 +56,27 @@ DEMO_USERS = {
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against a hash"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    """Hash a password"""
     return pwd_context.hash(password)
 
 
 def get_user_by_username(username: str) -> Optional[Dict]:
-    """Get user by username"""
     return DEMO_USERS.get(username)
 
 
 def authenticate_user(username: str, password: str) -> Optional[Dict]:
-    """Authenticate a user"""
     user = get_user_by_username(username)
     if not user:
         return None
     
-    # Check against demo password - simple string comparison for demo
     demo_password = _DEMO_USER_PASSWORDS.get(username)
     if not demo_password:
         return None
     
-    # Direct string comparison for simplicity in demo
     if password != demo_password:
         return None
     
-    # Return user copy without password
     return user.copy()

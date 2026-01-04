@@ -192,7 +192,6 @@ const Tasks: React.FC = () => {
     return true;
   });
 
-  // Calculate statistics
   const totalTasks = filteredTasks.length;
   const completedTasks = filteredTasks.filter(t => t.status === "completed").length;
   const inProgressTasks = filteredTasks.filter(t => t.status === "in_progress").length;
@@ -221,7 +220,7 @@ const Tasks: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            📥 Export
+            Export
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>Add New Task</Button>
         </div>

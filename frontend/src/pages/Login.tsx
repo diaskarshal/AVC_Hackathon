@@ -42,7 +42,6 @@ const Login: React.FC = () => {
 
   const quickLogin = (user: DemoUser) => {
     setUsername(user.username);
-    // Extract password from hint (e.g., "Password: admin123")
     const passwordMatch = user.hint.match(/Password: (\w+)/);
     if (passwordMatch) {
       setPassword(passwordMatch[1]);

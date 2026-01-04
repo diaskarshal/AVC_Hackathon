@@ -47,12 +47,10 @@ class ProjectService:
         return True
     
     def get_projects_summary(self) -> List[dict]:
-        """Get projects summary + progress"""
         projects = self.db.query(Project).all()
         summaries = []
         
         for project in projects:
-            # Calculate progress based on completed tasks
             total_tasks = self.db.query(Task).filter(Task.project_id == project.id).count()
             completed_tasks = self.db.query(Task).filter(
                 Task.project_id == project.id,

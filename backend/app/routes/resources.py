@@ -24,8 +24,6 @@ async def create_resource(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Create resource - admin and manager only"""
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if resource.project_id not in managed_projects:
@@ -51,7 +49,6 @@ async def get_resources(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get resources filtered by user role"""
     query = db.query(Resource)
     
     if current_user["role"] == "manager":
@@ -74,7 +71,6 @@ async def get_resource(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get single resource"""
     resource = db.query(Resource).filter(Resource.id == resource_id).first()
     
     if not resource:
@@ -83,7 +79,6 @@ async def get_resource(
             detail=f"Resource with id {resource_id} not found",
         )
     
-    # Check permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if resource.project_id not in managed_projects:
@@ -111,7 +106,6 @@ async def update_resource(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Update resource - admin and manager only"""
     db_resource = (
         db.query(Resource).filter(Resource.id == resource_id).first()
     )
@@ -122,7 +116,6 @@ async def update_resource(
             detail=f"Resource with id {resource_id} not found",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if db_resource.project_id not in managed_projects:
@@ -151,7 +144,6 @@ async def delete_resource(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Delete resource - admin and manager only"""
     db_resource = (
         db.query(Resource).filter(Resource.id == resource_id).first()
     )
@@ -162,7 +154,6 @@ async def delete_resource(
             detail=f"Resource with id {resource_id} not found",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if db_resource.project_id not in managed_projects:

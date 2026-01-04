@@ -46,7 +46,6 @@ class AnalyticsService:
         }
     
     def get_project_kpi(self, project_id: int) -> Dict:
-        """Get KPIs for a specific project"""
         project = self.db.query(Project).filter(Project.id == project_id).first()
         if not project:
             return {}
@@ -79,7 +78,6 @@ class AnalyticsService:
         }
     
     def get_budget_breakdown(self, project_id: int) -> List[Dict]:
-        """Get budget breakdown by category"""
         budgets = self.db.query(Budget).filter(Budget.project_id == project_id).all()
         
         breakdown = []
@@ -95,7 +93,6 @@ class AnalyticsService:
         return breakdown
     
     def get_resource_distribution(self, project_id: int) -> Dict:
-        """Get resource distribution by type"""
         resources = self.db.query(Resource).filter(Resource.project_id == project_id).all()
         
         distribution = {
@@ -139,7 +136,6 @@ class AnalyticsService:
         }
     
     def predict_completion(self, project_id: int) -> Dict:
-        """Simple prediction of completion date and cost"""
         project = self.db.query(Project).filter(Project.id == project_id).first()
         if not project:
             return {}
@@ -180,7 +176,6 @@ class AnalyticsService:
         }
     
     def get_manager_dashboard_stats(self, managed_project_ids: List[int]) -> Dict:
-        """Get dashboard stats filtered for manager's projects"""
         if not managed_project_ids:
             return {
                 "total_projects": 0,
@@ -249,7 +244,6 @@ class AnalyticsService:
 
 
     def get_worker_dashboard_stats(self, worker_name: str) -> Dict:
-        """Get dashboard stats for a specific worker"""
         total_tasks = self.db.query(Task).filter(
             Task.assigned_to == worker_name
         ).count()
@@ -270,7 +264,6 @@ class AnalyticsService:
             Task.planned_end_date < datetime.utcnow()
         ).count()
         
-        # Tasks due in next 7 days
         upcoming_deadline = datetime.utcnow() + timedelta(days=7)
         upcoming_tasks = self.db.query(Task).filter(
             Task.assigned_to == worker_name,
@@ -294,7 +287,6 @@ class AnalyticsService:
         }
 
     def get_team_performance(self, project_id: int = None) -> Dict:
-        """Get team performance metrics"""
         from sqlalchemy import case
         
         query = self.db.query(

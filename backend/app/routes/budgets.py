@@ -20,8 +20,6 @@ async def create_budget(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Create budget - admin and manager only"""
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if budget.project_id not in managed_projects:
@@ -46,15 +44,12 @@ async def get_budgets(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get budgets filtered by user role"""
     query = db.query(Budget)
     
-    # Filter based on user role
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         query = query.filter(Budget.project_id.in_(managed_projects))
     elif current_user["role"] == "worker":
-        # Workers can't access budgets - return empty
         return []
     
     if project_id:
@@ -71,7 +66,6 @@ async def get_budget(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get single budget"""
     budget = db.query(Budget).filter(Budget.id == budget_id).first()
     
     if not budget:
@@ -80,7 +74,6 @@ async def get_budget(
             detail=f"Budget with id {budget_id} not found",
         )
     
-    # Check permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if budget.project_id not in managed_projects:
@@ -108,7 +101,6 @@ async def update_budget(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Update budget - admin and manager only"""
     db_budget = db.query(Budget).filter(Budget.id == budget_id).first()
     
     if not db_budget:
@@ -117,7 +109,6 @@ async def update_budget(
             detail=f"Budget with id {budget_id} not found",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if db_budget.project_id not in managed_projects:
@@ -145,7 +136,6 @@ async def delete_budget(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Delete budget - admin and manager only"""
     db_budget = db.query(Budget).filter(Budget.id == budget_id).first()
     
     if not db_budget:
@@ -154,7 +144,6 @@ async def delete_budget(
             detail=f"Budget with id {budget_id} not found",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if db_budget.project_id not in managed_projects:

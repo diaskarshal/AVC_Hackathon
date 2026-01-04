@@ -58,7 +58,6 @@ const Projects: React.FC = () => {
         total_budget: parseFloat(formData.total_budget.toString()),
       };
 
-      // Only include dates if they are valid
       if (formData.start_date) {
         try {
           submitData.start_date = new Date(formData.start_date).toISOString();
@@ -208,7 +207,7 @@ const Projects: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            📥 Export
+            Export
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>
             Add New Project

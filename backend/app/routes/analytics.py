@@ -74,7 +74,6 @@ async def get_budget_breakdown(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get budget breakdown - admin and manager only"""
     if current_user["role"] == "worker":
         from fastapi import HTTPException, status
         raise HTTPException(
@@ -82,7 +81,6 @@ async def get_budget_breakdown(
             detail="Workers cannot access budget information",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if project_id not in managed_projects:
@@ -102,7 +100,6 @@ async def get_resource_distribution(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get resource distribution - admin and manager only"""
     if current_user["role"] == "worker":
         from fastapi import HTTPException, status
         raise HTTPException(
@@ -110,7 +107,6 @@ async def get_resource_distribution(
             detail="Workers cannot access resource information",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if project_id not in managed_projects:
@@ -130,8 +126,6 @@ async def get_project_timeline(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get project timeline with milestones"""
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if project_id not in managed_projects:
@@ -151,8 +145,6 @@ async def predict_completion(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Predict project completion date and cost using ML"""
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_projects = current_user.get("managed_projects", [])
         if project_id not in managed_projects:

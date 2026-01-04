@@ -176,7 +176,6 @@ const Resources: React.FC = () => {
     return true;
   });
 
-  // Calculate totals
   const totalCost = filteredResources.reduce((sum, r) => sum + r.total_cost, 0);
 
   if (loading) {
@@ -201,7 +200,7 @@ const Resources: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900">Resources</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            📥 Export
+            Export
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>
             Add New Resource

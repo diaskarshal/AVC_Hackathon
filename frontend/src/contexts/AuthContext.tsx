@@ -22,7 +22,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   });
   const navigate = useNavigate();
 
-  // Check authentication on mount
   useEffect(() => {
     checkAuth();
   }, []);
@@ -33,7 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (token && userStr) {
       try {
-        // Verify token is still valid by fetching user info
         const response = await authAPI.getCurrentUser(token);
         setAuthState({
           user: response.data,
@@ -42,7 +40,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           isLoading: false,
         });
       } catch (error) {
-        // Token invalid, clear storage
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setAuthState({

@@ -1,7 +1,4 @@
-"""
-Seed script to populate database with sample data for demo purposes.
-Run with: docker-compose exec backend python -m app.utils.seed_data in a new terminal after the docker-compose is up
-"""
+#Run with: docker-compose exec backend python -m app.utils.seed_data
 
 from datetime import datetime, timedelta
 from app.database import SessionLocal
@@ -17,9 +14,8 @@ def seed_database():
     db = SessionLocal()
     
     try:
-        print("🌱 Starting database seeding...")
+        print("Starting database seeding...")
         
-        # Create Projects
         projects_data = [
             {
                 "name": "Residential Complex Alpha",
@@ -60,13 +56,11 @@ def seed_database():
             projects.append(project)
         
         db.commit()
-        print(f"✅ Created {len(projects)} projects")
+        print(f"Created {len(projects)} projects")
         
-        # Refresh to get IDs
         for proj in projects:
             db.refresh(proj)
         
-        # Create Tasks for Project 1
         tasks_project1 = [
             {
                 "project_id": projects[0].id,
@@ -127,7 +121,6 @@ def seed_database():
             }
         ]
         
-        # Create Tasks for Project 2
         tasks_project2 = [
             {
                 "project_id": projects[1].id,
@@ -160,9 +153,8 @@ def seed_database():
             db.add(task)
         
         db.commit()
-        print(f"✅ Created {len(all_tasks)} tasks")
+        print(f"Created {len(all_tasks)} tasks")
         
-        # Create Resources for Project 1
         resources_project1 = [
             {
                 "project_id": projects[0].id,
@@ -236,11 +228,9 @@ def seed_database():
             db.add(resource)
         
         db.commit()
-        print(f"✅ Created {len(all_resources)} resources")
+        print(f"Created {len(all_resources)} resources")
         
-        # Create Budget entries
         budgets = [
-            # Project 1
             {
                 "project_id": projects[0].id,
                 "category": "Materials",
@@ -269,7 +259,7 @@ def seed_database():
                 "planned_amount": 500000.0,
                 "actual_amount": 0.0
             },
-            # Project 2
+
             {
                 "project_id": projects[1].id,
                 "category": "Materials",
@@ -298,9 +288,9 @@ def seed_database():
             db.add(budget)
         
         db.commit()
-        print(f"✅ Created {len(budgets)} budget entries")
+        print(f"Created {len(budgets)} budget entries")
         
-        print("\n🎉 Database seeding completed successfully!")
+        print("\nDatabase seeding completed successfully!")
         print(f"📊 Summary:")
         print(f"   - Projects: {len(projects)}")
         print(f"   - Tasks: {len(all_tasks)}")
@@ -308,7 +298,7 @@ def seed_database():
         print(f"   - Budget Entries: {len(budgets)}")
         
     except Exception as e:
-        print(f"❌ Error seeding database: {e}")
+        print(f"Error seeding database: {e}")
         db.rollback()
         raise
     finally:

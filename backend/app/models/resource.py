@@ -29,7 +29,7 @@ class Resource(Base):
     status = Column(Enum(ResourceStatus), default=ResourceStatus.AVAILABLE)
     
     quantity = Column(Float, default=0.0)
-    unit = Column(String(50))  # kg, m3, hours, pieces, etc.
+    unit = Column(String(50))
     
     unit_cost = Column(Float, default=0.0)
     total_cost = Column(Float, default=0.0)
@@ -38,7 +38,6 @@ class Resource(Base):
     
     allocated_date = Column(DateTime, default=datetime.utcnow)
     
-    # Metadata
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

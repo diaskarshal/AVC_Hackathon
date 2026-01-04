@@ -27,7 +27,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
@@ -148,7 +147,6 @@ export interface WorkerStats {
   task_completion_rate: number;
 }
 
-// Projects
 export const projectsAPI = {
   getAll: () => api.get<Project[]>("/api/projects/"),
   getById: (id: number) => api.get<Project>(`/api/projects/${id}`),
@@ -160,7 +158,6 @@ export const projectsAPI = {
   getSummary: () => api.get("/api/projects/summary"),
 };
 
-// Tasks
 export const tasksAPI = {
   getAll: (params?: { project_id?: number; status?: string }) =>
     api.get<Task[]>("/api/tasks/", { params }),
@@ -173,7 +170,6 @@ export const tasksAPI = {
     api.get<Task[]>(`/api/tasks/project/${projectId}/overdue`),
 };
 
-// Resources
 export const resourcesAPI = {
   getAll: (params?: {
     project_id?: number;
@@ -187,7 +183,6 @@ export const resourcesAPI = {
   delete: (id: number) => api.delete(`/api/resources/${id}`),
 };
 
-// Budgets
 export const budgetsAPI = {
   getAll: (params?: { project_id?: number; category?: string }) =>
     api.get<Budget[]>("/api/budgets/", { params }),

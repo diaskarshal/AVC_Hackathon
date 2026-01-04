@@ -10,7 +10,7 @@ class Budget(Base):
     id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     
-    category = Column(String(255), nullable=False)  # Materials, Labor, Equipment, etc.
+    category = Column(String(255), nullable=False)
     description = Column(Text)
     
     planned_amount = Column(Float, default=0.0)

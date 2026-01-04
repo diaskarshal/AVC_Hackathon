@@ -33,16 +33,13 @@ async def get_projects(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get projects based on user role"""
     service = ProjectService(db)
     
-    # Managers see only their assigned projects
     if current_user["role"] == "manager":
         managed_project_ids = current_user.get("managed_projects", [])
         projects = service.get_projects(skip=skip, limit=limit)
         return [p for p in projects if p.id in managed_project_ids]
     
-    # Admin and workers see all projects
     return service.get_projects(skip=skip, limit=limit)
 
 
@@ -76,7 +73,6 @@ async def get_project(
             detail=f"Project with id {project_id} not found",
         )
     
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_project_ids = current_user.get("managed_projects", [])
         if project_id not in managed_project_ids:
@@ -99,7 +95,6 @@ async def update_project(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    # Check manager permissions
     if current_user["role"] == "manager":
         managed_project_ids = current_user.get("managed_projects", [])
         if project_id not in managed_project_ids:

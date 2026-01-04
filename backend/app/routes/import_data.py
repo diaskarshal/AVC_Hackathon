@@ -19,7 +19,6 @@ router = APIRouter()
 async def import_from_excel(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
-    """Import from Excel - admin only"""
     if not any(
         file.filename.endswith(ext) for ext in settings.allowed_extensions_set
     ):
@@ -50,7 +49,6 @@ async def import_from_excel(
 async def import_from_csv(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):
-    """Import from CSV - admin only"""
     if not file.filename.endswith(".csv"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

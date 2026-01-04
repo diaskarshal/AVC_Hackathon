@@ -44,7 +44,6 @@ const Import: React.FC = () => {
 
       setResult(response.data);
       setSelectedFile(null);
-      // Reset file input
       const fileInput = document.getElementById(
         "file-upload"
       ) as HTMLInputElement;

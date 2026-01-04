@@ -10,7 +10,6 @@ security = HTTPBearer()
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
-    """Get current authenticated user from JWT token"""
     token = credentials.credentials
     payload = verify_token(token)
     
@@ -35,14 +34,12 @@ async def get_current_user(
             detail="User not found",
         )
     
-    # Return user without password hash
     user_copy = user.copy()
     user_copy.pop("password_hash", None)
     return user_copy
 
 
 def require_role(*allowed_roles: str):
-    """Dependency to check if user has required role"""
     async def role_checker(current_user: dict = Depends(get_current_user)):
         if current_user["role"] not in allowed_roles:
             raise HTTPException(

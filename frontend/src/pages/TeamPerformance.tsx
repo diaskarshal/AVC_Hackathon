@@ -82,7 +82,6 @@ const TeamPerformancePage: React.FC = () => {
     );
   }
 
-  // Calculate overall stats
   const totalTasks = performance.reduce((sum, p) => sum + p.total_tasks, 0);
   const totalCompleted = performance.reduce(
     (sum, p) => sum + p.completed_tasks,

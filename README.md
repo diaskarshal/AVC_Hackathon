@@ -8,16 +8,19 @@
 
 todo:
 - workers should be shown the tasks their team assigned to, not the whole tasks.
-- use patch(1 field - status) instead of put(updates all fields) in the workers' tasks update modal
+- use patch(1 field - status) instead of put(updates all fields) in the workers' tasks update modal  
+- «Автоматизация расчёта ресурсов для ремонта заводского оборудования» (Data Science / Аналитика);  
+- Применение инновационных методов в управлении ресурсами при ремонтах заводов;  
+- форма завершения: Авт. расчет ресурсов с использованием истор. данных и LLM.  
 
-**BuildFlow** is a modern ERP system designed for construction project management, developed for AVC Group.
+**BuildFlow** -- ERP system designed for construction project management.
 
 ![BuildFlow Dashboard](docs/dashboard.png)
 
 
 ---
 
-## ✨ Features
+## Features
 
 ### Core Functionality
 - **Project Management**: Create, track, and manage construction projects with timelines and budgets
@@ -39,21 +42,15 @@ todo:
 - **Data Export**: Export any data view to CSV for further analysis
 - **Bulk Operations**: Create and update multiple records efficiently
 
-### User Interface
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-- **Intuitive Navigation**: Role-based navigation tailored to user permissions
-- **Real-time Notifications**: Get alerted about overdue tasks and critical updates
-- **Dark Mode Ready**: UI components prepared for dark theme support
-
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
 - **Framework**: FastAPI 0.119.0
 - **Database**: PostgreSQL 15
 - **ORM**: SQLAlchemy 2.0.23
-- **Authentication**: JWT (python-jose)
+- **Authentication**: JWT
 - **Password Hashing**: bcrypt with passlib
 - **Data Processing**: Pandas 2.1.3
 - **ML**: Scikit-learn 1.3.2
@@ -74,11 +71,7 @@ todo:
 
 ---
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Docker 20.10+ and Docker Compose 2.0+
+## Quick Start
 
 ### Installation
 
@@ -92,17 +85,15 @@ cd buildflow
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your settings
 cd ..
 ```
 
 3. **Start the application**
 ```bash
-# Build and start all services
 docker-compose up --build
 ```
 
-4. **Seed the database** (in a new terminal)
+4. **Seed the database**
 ```bash
 docker-compose exec backend python -m app.utils.seed_data
 ```
@@ -111,7 +102,7 @@ docker-compose exec backend python -m app.utils.seed_data
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
-- **Database**: localhost:5432 (credentials in docker-compose.yml)
+- **Database**: localhost:5432
 
 ### Demo Accounts
 
@@ -125,110 +116,7 @@ docker-compose exec backend python -m app.utils.seed_data
 
 ---
 
-## 📁 Project Structure
-
-Check at the [uithub link.](https://uithub.com/diaskarshal/AVC_Hackathon)
-
----
-
-## 👥 User Roles
-
-### Admin
-**Full system access** with the following capabilities:
-- ✅ View and manage all projects
-- ✅ Create, edit, and delete projects
-- ✅ Manage all tasks, resources, and budgets
-- ✅ View team performance metrics
-- ✅ Manage user accounts
-- ✅ Import/export data
-- ✅ Access all system reports
-
-### Manager
-**Project-specific management** with:
-- ✅ View and manage assigned projects only
-- ✅ Create and assign tasks within their projects
-- ✅ Manage resources for their projects
-- ✅ Track budgets and expenses
-- ✅ View team performance for their projects
-- ❌ Cannot manage other projects
-- ❌ Cannot manage users
-- ❌ Limited to assigned project data
-
-### Worker
-**Task execution focus** with:
-- ✅ View assigned tasks only
-- ✅ Update task progress and status
-- ✅ Mark tasks as complete
-- ✅ View own performance metrics
-- ❌ Cannot view project budgets
-- ❌ Cannot manage resources
-- ❌ Cannot create or delete tasks
-- ❌ Limited to personal task view
-
----
-
-## 📚 API Documentation
-
-### Base URL
-```
-Development: http://localhost:8000
-Production: https://your-domain.com
-```
-
-### Authentication
-
-All protected endpoints require a JWT token in the Authorization header:
-```
-Authorization: Bearer <your_jwt_token>
-```
-
-### Endpoints Overview
-
-#### Authentication
-```http
-POST   /api/auth/login          # Login and get JWT token
-GET    /api/auth/me             # Get current user info
-GET    /api/auth/demo-users     # Get demo users list
-```
-
-#### Projects
-```http
-POST   /api/projects/           # Create project (Admin only)
-GET    /api/projects/           # List projects (filtered by role)
-GET    /api/projects/{id}       # Get project details
-PUT    /api/projects/{id}       # Update project (Admin/Manager)
-DELETE /api/projects/{id}       # Delete project (Admin only)
-GET    /api/projects/summary    # Get projects summary
-```
-
-#### Tasks
-```http
-POST   /api/tasks/              # Create task (Admin/Manager)
-GET    /api/tasks/              # List tasks (filtered by role)
-GET    /api/tasks/{id}          # Get task details
-PUT    /api/tasks/{id}          # Update task (role-dependent)
-DELETE /api/tasks/{id}          # Delete task (Admin/Manager)
-```
-
-#### Resources
-```http
-POST   /api/resources/          # Create resource (Admin/Manager)
-GET    /api/resources/          # List resources
-GET    /api/resources/{id}      # Get resource details
-PUT    /api/resources/{id}      # Update resource (Admin/Manager)
-DELETE /api/resources/{id}      # Delete resource (Admin/Manager)
-```
-
-#### Budgets
-```http
-POST   /api/budgets/            # Create budget (Admin/Manager)
-GET    /api/budgets/            # List budgets
-GET    /api/budgets/{id}        # Get budget details
-PUT    /api/budgets/{id}        # Update budget (Admin/Manager)
-DELETE /api/budgets/{id}        # Delete budget (Admin/Manager)
-```
-
-#### Analytics
+## Analytics
 ```http
 GET    /api/analytics/dashboard                          # Dashboard stats
 GET    /api/analytics/project/{id}/kpi                   # Project KPIs
@@ -239,165 +127,51 @@ GET    /api/analytics/project/{id}/predict-completion    # ML predictions
 GET    /api/analytics/team-performance                   # Team metrics
 ```
 
-#### Data Import
+### Data Import
 ```http
 POST   /api/import/excel        # Import Excel file (Admin only)
 POST   /api/import/csv          # Import CSV file (Admin only)
 ```
 
-#### Users
-```http
-GET    /api/users/              # List all users (Admin only)
-GET    /api/users/profile       # Get own profile
-PUT    /api/users/profile       # Update own profile
-GET    /api/users/team          # Get team members (Admin/Manager)
-```
-
 ---
 
-## 💻 Development
-
-### Backend Development
-
-#### Setup local environment
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-#### Run backend locally
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-#### Database migrations
-```bash
-# Create migration
-docker-compose exec backend alembic revision --autogenerate -m "description"
-
-# Apply migration
-docker-compose exec backend alembic upgrade head
-
-# Rollback migration
-docker-compose exec backend alembic downgrade -1
-```
-
-#### Access database directly
-```bash
-docker-compose exec db psql -U buildflow -d buildflow_db
-```
-
-### Frontend Development
-
-#### Setup local environment
-```bash
-cd frontend
-npm install
-```
-
-
----
-### Environment Variables
-
-#### Backend (.env)
-```env
-# Application
-APP_NAME=BuildFlow ERP
-APP_VERSION=1.0.0
-DEBUG=False
-
-# Database
-DATABASE_URL=postgresql://user:password@host:port/database
-
-# Security
-SECRET_KEY=your-super-secret-key-here
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# CORS
-CORS_ORIGINS=https://yourdomain.com
-
-# Upload
-MAX_UPLOAD_SIZE=10485760
-ALLOWED_EXTENSIONS=.xlsx,.xls,.csv
-```
-
-#### Frontend (.env)
-```env
-REACT_APP_API_URL=https://api.yourdomain.com
-```
-
----
-
-## 🔒 Security
-
-### Authentication & Authorization
-- JWT-based authentication with configurable expiration
-- Role-based access control (RBAC)
-- Secure password hashing with bcrypt
-- Token refresh mechanism
-
-### Data Security
-- SQL injection prevention via SQLAlchemy ORM
-- XSS protection in frontend
-- CSRF protection for state-changing operations
-- Input validation and sanitization
-
----
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
 #### Port Already in Use
 ```bash
-# Find and kill process using port 3000
 lsof -ti:3000 | xargs kill -9
 
-# Find and kill process using port 8000
 lsof -ti:8000 | xargs kill -9
 ```
 
 #### Database Connection Failed
 ```bash
-# Check if PostgreSQL container is running
 docker-compose ps
 
-# View PostgreSQL logs
 docker-compose logs db
 
-# Restart database
 docker-compose restart db
 ```
 
-#### Permission Denied (Linux/Mac)
-```bash
-# Run with sudo
-sudo docker-compose up --build
-```
 
 #### Frontend Build Errors
 ```bash
-# Clear node_modules and reinstall
 cd frontend
 rm -rf node_modules package-lock.json
 npm install
 
-# Clear cache
 npm cache clean --force
 ```
 
 #### Backend Import Errors
 ```bash
-# Rebuild Python dependencies
 docker-compose build --no-cache backend
 ```
 
 #### Database Migration Issues
 ```bash
-# Reset database (⚠️ destroys all data)
 docker-compose down -v
 docker-compose up --build
 docker-compose exec backend python -m app.utils.seed_data

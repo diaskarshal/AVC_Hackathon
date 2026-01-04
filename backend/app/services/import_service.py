@@ -15,7 +15,6 @@ class ImportService:
         self._project_name_to_id: Dict[str, int] = {}
     
     def _build_project_mapping(self):
-        """Build a mapping of project names to IDs"""
         projects = self.db.query(Project).all()
         self._project_name_to_id = {
             project.name.lower().strip(): project.id 
@@ -27,14 +26,9 @@ class ImportService:
         row: pd.Series, 
         row_index: int
     ) -> Optional[int]:
-        """
-        Get project_id from row, supporting both project_id and project_name
-        """
-        # Try project_id first
         if pd.notna(row.get('project_id')):
             try:
                 project_id = int(row.get('project_id'))
-                # Verify this project exists
                 exists = self.db.query(Project).filter(
                     Project.id == project_id
                 ).first()
@@ -48,7 +42,6 @@ class ImportService:
             except:
                 print(f"Row {row_index}: Invalid project_id format")
         
-        # Try project_name
         if pd.notna(row.get('project_name')):
             project_name = str(row.get('project_name')).lower().strip()
             if project_name in self._project_name_to_id:
@@ -62,11 +55,9 @@ class ImportService:
         return None
     
     def import_from_excel(self, file_content: bytes, filename: str) -> Dict:
-        """Import data from Excel file with multiple sheets"""
         try:
             excel_file = BytesIO(file_content)
             
-            # Reads all sheets
             sheets = pd.read_excel(
                 excel_file, sheet_name=None, engine='openpyxl'
             )
@@ -78,15 +69,12 @@ class ImportService:
                 "budgets": 0
             }
             
-            # Import projects first
             if 'Projects' in sheets or 'projects' in sheets:
                 sheet_name = 'Projects' if 'Projects' in sheets else 'projects'
                 stats["projects"] = self._import_projects(sheets[sheet_name])
             
-            # Rebuild project mapping after importing projects
             self._build_project_mapping()
             
-            # Then import dependent entities
             if 'Tasks' in sheets or 'tasks' in sheets:
                 sheet_name = 'Tasks' if 'Tasks' in sheets else 'tasks'
                 stats["tasks"] = self._import_tasks(sheets[sheet_name])
@@ -126,7 +114,6 @@ class ImportService:
             df.columns = df.columns.str.strip().str.lower()
             columns = set(df.columns)
             
-            # Check for BUDGETS first (most specific - has category + planned_amount)
             if 'category' in columns and 'planned_amount' in columns:
                 self._build_project_mapping()
                 count = self._import_budgets(df)
@@ -136,8 +123,6 @@ class ImportService:
                     "resources": 0,
                     "budgets": count
                 }
-            
-            # Check for RESOURCES (has resource_type or resource_name)
             elif 'resource_name' in columns or 'resource_type' in columns:
                 self._build_project_mapping()
                 count = self._import_resources(df)
@@ -148,7 +133,6 @@ class ImportService:
                     "budgets": 0
                 }
             
-            # Check for TASKS (has task_name or task-specific columns)
             elif 'task_name' in columns or (
                 'name' in columns and (
                     'assigned_to' in columns or 
@@ -166,7 +150,6 @@ class ImportService:
                     "budgets": 0
                 }
             
-            # Check for PROJECTS last (most general - can have project_name or basic columns)
             elif 'project_name' in columns or (
                 'name' in columns and 'total_budget' in columns
             ):
@@ -189,13 +172,11 @@ class ImportService:
             raise Exception(f"Error importing CSV: {str(e)}")
     
     def _import_projects(self, df: pd.DataFrame) -> int:
-        """Import projects from dataframe"""
         count = 0
         df.columns = df.columns.str.strip().str.lower()
         
         for index, row in df.iterrows():
             try:
-                # Handle different column name variations
                 name = row.get('name') or row.get('project_name')
                 if pd.isna(name):
                     print(f"Skipping row {index}: missing project name")
@@ -206,12 +187,10 @@ class ImportService:
                     print(f"Skipping row {index}: empty project name")
                     continue
                 
-                # Parse description
                 description = ''
                 if pd.notna(row.get('description')):
                     description = str(row.get('description')).strip()
                 
-                # Parse dates
                 start_date = None
                 if pd.notna(row.get('start_date')):
                     try:
@@ -233,7 +212,6 @@ class ImportService:
                             f"Row {index}: Invalid end_date, skipping"
                         )
                 
-                # Parse budget
                 total_budget = 0.0
                 if pd.notna(row.get('total_budget')):
                     try:
@@ -252,7 +230,6 @@ class ImportService:
                             f"Row {index}: Invalid spent_amount, using 0.0"
                         )
                 
-                # Parse location
                 location = ''
                 if pd.notna(row.get('location')):
                     location = str(row.get('location')).strip()
@@ -270,7 +247,7 @@ class ImportService:
                     location=location
                 )
                 self.db.add(project)
-                self.db.flush()  # Flush to get the ID
+                self.db.flush()
                 count += 1
             except Exception as e:
                 print(f"Error importing project row {index}: {e}")
@@ -280,13 +257,11 @@ class ImportService:
         return count
     
     def _import_tasks(self, df: pd.DataFrame) -> int:
-        """Import tasks from dataframe"""
         count = 0
         df.columns = df.columns.str.strip().str.lower()
         
         for index, row in df.iterrows():
             try:
-                # Validate required fields
                 name = row.get('name') or row.get('task_name')
                 if pd.isna(name):
                     print(f"Skipping row {index}: missing task name")
@@ -297,7 +272,6 @@ class ImportService:
                     print(f"Skipping row {index}: empty task name")
                     continue
                 
-                # Get project_id using enhanced method
                 project_id = self._get_project_id(row, index)
                 if project_id is None:
                     print(
@@ -306,12 +280,10 @@ class ImportService:
                     )
                     continue
                 
-                # Parse description
                 description = ''
                 if pd.notna(row.get('description')):
                     description = str(row.get('description')).strip()
                 
-                # Parse dates
                 start_date = None
                 if pd.notna(row.get('start_date')):
                     try:
@@ -329,7 +301,6 @@ class ImportService:
                     except:
                         print(f"Row {index}: Invalid end_date")
                 
-                # Parse progress
                 progress = 0.0
                 progress_field = row.get('progress') or row.get(
                     'progress_percentage'
@@ -343,7 +314,6 @@ class ImportService:
                             f"Row {index}: Invalid progress, using 0.0"
                         )
                 
-                # Parse assigned_to
                 assigned_to = ''
                 if pd.notna(row.get('assigned_to')):
                     assigned_to = str(row.get('assigned_to')).strip()
@@ -373,13 +343,11 @@ class ImportService:
         return count
     
     def _import_resources(self, df: pd.DataFrame) -> int:
-        """Import resources from dataframe"""
         count = 0
         df.columns = df.columns.str.strip().str.lower()
         
         for index, row in df.iterrows():
             try:
-                # Validate required fields
                 name = row.get('name') or row.get('resource_name')
                 if pd.isna(name):
                     print(f"Skipping row {index}: missing resource name")
@@ -390,7 +358,6 @@ class ImportService:
                     print(f"Skipping row {index}: empty resource name")
                     continue
                 
-                # Get project_id using enhanced method
                 project_id = self._get_project_id(row, index)
                 if project_id is None:
                     print(
@@ -399,7 +366,6 @@ class ImportService:
                     )
                     continue
                 
-                # Parse quantity
                 quantity = 0.0
                 if pd.notna(row.get('quantity')):
                     try:
@@ -408,12 +374,10 @@ class ImportService:
                     except:
                         print(f"Row {index}: Invalid quantity, using 0.0")
                 
-                # Parse unit
                 unit = 'units'
                 if pd.notna(row.get('unit')):
                     unit = str(row.get('unit')).strip()
                 
-                # Parse unit_cost
                 unit_cost = 0.0
                 if pd.notna(row.get('unit_cost')):
                     try:
@@ -422,7 +386,6 @@ class ImportService:
                     except:
                         print(f"Row {index}: Invalid unit_cost, using 0.0")
                 
-                # Parse supplier
                 supplier = ''
                 if pd.notna(row.get('supplier')):
                     supplier = str(row.get('supplier')).strip()
@@ -452,13 +415,11 @@ class ImportService:
         return count
     
     def _import_budgets(self, df: pd.DataFrame) -> int:
-        """Import budgets from dataframe"""
         count = 0
         df.columns = df.columns.str.strip().str.lower()
         
         for index, row in df.iterrows():
             try:
-                # Validate required fields
                 category = row.get('category')
                 if pd.isna(category):
                     print(f"Skipping row {index}: missing category")
@@ -469,7 +430,6 @@ class ImportService:
                     print(f"Skipping row {index}: empty category")
                     continue
                 
-                # Get project_id using enhanced method
                 project_id = self._get_project_id(row, index)
                 if project_id is None:
                     print(
@@ -478,12 +438,10 @@ class ImportService:
                     )
                     continue
                 
-                # Parse description
                 description = ''
                 if pd.notna(row.get('description')):
                     description = str(row.get('description')).strip()
                 
-                # Parse planned_amount
                 planned_amount = 0.0
                 if pd.notna(row.get('planned_amount')):
                     try:
@@ -494,7 +452,6 @@ class ImportService:
                             f"Row {index}: Invalid planned_amount, using 0.0"
                         )
                 
-                # Parse actual_amount
                 actual_amount = 0.0
                 if pd.notna(row.get('actual_amount')):
                     try:
@@ -521,7 +478,6 @@ class ImportService:
         self.db.commit()
         return count
     
-    # Helper methods to parse enum values
     def _parse_project_status(self, status: str) -> ProjectStatus:
         if pd.isna(status):
             return ProjectStatus.PLANNING

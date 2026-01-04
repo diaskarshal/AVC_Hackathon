@@ -73,7 +73,6 @@ const Users: React.FC = () => {
     );
   }
 
-  // Group users by role
   const adminUsers = users.filter((u) => u.role === "admin");
   const managerUsers = users.filter((u) => u.role === "manager");
   const workerUsers = users.filter((u) => u.role === "worker");

@@ -54,7 +54,6 @@ const UserMenu: React.FC = () => {
               <div className="text-xs text-gray-500">{user.email}</div>
             </div>
             
-            {/* ADD PROFILE LINK */}
             <Link
               to="/profile"
               onClick={() => setIsOpen(false)}

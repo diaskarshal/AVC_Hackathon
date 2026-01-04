@@ -1,19 +1,15 @@
 #!/bin/bash
 
-# BuildFlow API Testing Script
-# Tests all major endpoints to verify the system is working
-
 BASE_URL="http://localhost:8000"
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-echo "🧪 BuildFlow API Testing"
+echo "API Testing"
 echo "========================"
 echo ""
 
-# Test 1: Health Check
 echo -n "1. Health Check... "
 response=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/health")
 if [ "$response" -eq 200 ]; then
@@ -22,7 +18,6 @@ else
     echo -e "${RED}✗ FAILED (HTTP $response)${NC}"
 fi
 
-# Test 2: Root Endpoint
 echo -n "2. Root Endpoint... "
 response=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/")
 if [ "$response" -eq 200 ]; then
@@ -31,7 +26,6 @@ else
     echo -e "${RED}✗ FAILED (HTTP $response)${NC}"
 fi
 
-# Test 3: Create Project
 echo -n "3. Create Project... "
 create_response=$(curl -s -X POST "$BASE_URL/api/projects/" \
   -H "Content-Type: application/json" \
@@ -53,7 +47,6 @@ else
     echo -e "${RED}✗ FAILED${NC}"
 fi
 
-# Test 4: Get All Projects
 echo -n "4. Get All Projects... "
 response=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/projects/")
 if [ "$response" -eq 200 ]; then
@@ -62,7 +55,6 @@ else
     echo -e "${RED}✗ FAILED (HTTP $response)${NC}"
 fi
 
-# Test 5: Get Project by ID
 if [ ! -z "$project_id" ]; then
     echo -n "5. Get Project by ID... "
     response=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/projects/$project_id")
@@ -73,7 +65,6 @@ if [ ! -z "$project_id" ]; then
     fi
 fi
 
-# Test 6: Create Task
 if [ ! -z "$project_id" ]; then
     echo -n "6. Create Task... "
     task_response=$(curl -s -X POST "$BASE_URL/api/tasks/" \
@@ -97,7 +88,6 @@ if [ ! -z "$project_id" ]; then
     fi
 fi
 
-# Test 7: Create Resource
 if [ ! -z "$project_id" ]; then
     echo -n "7. Create Resource... "
     resource_response=$(curl -s -X POST "$BASE_URL/api/resources/" \
@@ -122,7 +112,6 @@ if [ ! -z "$project_id" ]; then
     fi
 fi
 
-# Test 8: Create Budget
 if [ ! -z "$project_id" ]; then
     echo -n "8. Create Budget... "
     budget_response=$(curl -s -X POST "$BASE_URL/api/budgets/" \
@@ -144,7 +133,6 @@ if [ ! -z "$project_id" ]; then
     fi
 fi
 
-# Test 9: Dashboard Analytics
 echo -n "9. Dashboard Analytics... "
 response=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/analytics/dashboard")
 if [ "$response" -eq 200 ]; then
@@ -153,7 +141,6 @@ else
     echo -e "${RED}✗ FAILED (HTTP $response)${NC}"
 fi
 
-# Test 10: Project KPI
 if [ ! -z "$project_id" ]; then
     echo -n "10. Project KPI... "
     response=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/api/analytics/project/$project_id/kpi")
@@ -166,7 +153,7 @@ fi
 
 echo ""
 echo "========================"
-echo "✨ Testing Complete!"
+echo "Testing Complete!"
 echo ""
 echo -e "${YELLOW}View full API documentation at:${NC}"
 echo "$BASE_URL/docs"

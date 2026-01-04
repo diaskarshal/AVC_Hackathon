@@ -11,7 +11,6 @@ class Settings(BaseSettings):
         "postgresql://buildflow:buildflow123@db:5432/buildflow_db"
     )
     
-    # store as strings, convert via properties
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     ALLOWED_EXTENSIONS: str = ".xlsx,.xls,.csv"
     

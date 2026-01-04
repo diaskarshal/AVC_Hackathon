@@ -7,7 +7,6 @@ from app.config import settings
 def create_access_token(
     data: dict, expires_delta: Optional[timedelta] = None
 ) -> str:
-    """Create JWT access token"""
     to_encode = data.copy()
     
     if expires_delta:
@@ -25,7 +24,6 @@ def create_access_token(
 
 
 def verify_token(token: str) -> Optional[Dict]:
-    """Verify and decode JWT token"""
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]

@@ -162,7 +162,6 @@ const Budgets: React.FC = () => {
     return true;
   });
 
-  // Calculate totals
   const totalPlanned = filteredBudgets.reduce(
     (sum, b) => sum + b.planned_amount,
     0
@@ -197,7 +196,7 @@ const Budgets: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            📥 Export
+            Export
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>
             Add Budget Entry

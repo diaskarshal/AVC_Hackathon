@@ -22,7 +22,6 @@ class LoginResponse(BaseModel):
 
 @router.post("/login", response_model=LoginResponse)
 async def login(credentials: LoginRequest):
-    """Login endpoint - authenticate user and return JWT token"""
     user = authenticate_user(credentials.username, credentials.password)
     
     if not user:
@@ -32,7 +31,6 @@ async def login(credentials: LoginRequest):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Create access token
     access_token_expires = timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
@@ -50,18 +48,15 @@ async def login(credentials: LoginRequest):
 
 @router.get("/me")
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
-    """Get current authenticated user information"""
     return current_user
 
 
 @router.get("/demo-users")
 async def get_demo_users():
-    """Get list of demo users for login page (for presentation purposes)"""
     from app.auth.demo_users import DEMO_USERS, _DEMO_USER_PASSWORDS
     
     demo_info = []
     for username, user_data in DEMO_USERS.items():
-        # Get the actual password from the password dict
         actual_password = _DEMO_USER_PASSWORDS.get(username, "")
         demo_info.append({
             "username": username,
