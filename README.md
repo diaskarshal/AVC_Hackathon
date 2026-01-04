@@ -106,13 +106,13 @@ docker-compose exec backend python -m app.utils.seed_data
 
 ### Demo Accounts
 
-| Role | Username | Password | Access Level |
-|------|----------|----------|--------------|
-| Admin | `admin` | `admin123` | Full system access |
-| Manager | `manager1` | `manager123` | Projects 1-2 management |
-| Worker | `worker1` | `worker123` | Own tasks only |
-| Worker | `worker2` | `worker123` | Own tasks only |
-| Worker | `worker3` | `worker123` | Own tasks only |
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `admin123` |
+| Manager | `manager1` | `manager123` |
+| Worker | `worker1` | `worker123` |
+| Worker | `worker2` | `worker123` |
+| Worker | `worker3` | `worker123` |
 
 ---
 
