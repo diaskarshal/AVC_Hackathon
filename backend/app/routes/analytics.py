@@ -25,6 +25,17 @@ async def get_dashboard_stats(
     return stats
 
 
+@router.get("/charts")
+async def get_charts_data(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if current_user["role"] == "worker":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    service = AnalyticsService(db)
+    return service.get_charts_data()
+
+
 @router.get("/team-performance")
 async def get_team_performance(
     project_id: int = None,

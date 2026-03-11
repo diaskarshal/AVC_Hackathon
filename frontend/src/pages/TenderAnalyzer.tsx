@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardHeader, CardBody } from "../components/Card";
 import Button from "../components/Button";
-import api from "../services/API";
+import api, { tenderAPI } from "../services/API";
 
 interface TenderListItem {
   id: number;
@@ -80,8 +80,93 @@ const TenderAnalyzer: React.FC = () => {
   const [editResources, setEditResources] = useState<ResourceItem[]>([]);
   const [editTasks, setEditTasks] = useState<TaskItem[]>([]);
 
+  // Confidence gauge
+  const gaugeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (step !== "results" || !analysis || !gaugeRef.current) return;
+    const Plotly = (window as any).Plotly;
+    if (!Plotly) return;
+    const score = analysis.confidence_score || 0;
+    const color = score >= 0.7 ? "#16a34a" : score >= 0.4 ? "#d97706" : "#dc2626";
+    Plotly.newPlot(
+      gaugeRef.current,
+      [{
+        type: "indicator",
+        mode: "gauge+number",
+        value: Math.round(score * 100),
+        number: { suffix: "%", font: { size: 28, color } },
+        gauge: {
+          axis: { range: [0, 100], tickwidth: 1, tickcolor: "#9ca3af" },
+          bar: { color, thickness: 0.3 },
+          bgcolor: "white",
+          borderwidth: 0,
+          steps: [
+            { range: [0, 40], color: "#fef2f2" },
+            { range: [40, 70], color: "#fffbeb" },
+            { range: [70, 100], color: "#f0fdf4" },
+          ],
+        },
+      }],
+      { margin: { t: 10, b: 5, l: 20, r: 20 }, height: 140, paper_bgcolor: "rgba(0,0,0,0)" },
+      { displayModeBar: false, responsive: true }
+    );
+  }, [step, analysis]);
+
+  // Gantt chart
+  const ganttRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (step !== "results" || !ganttRef.current || editTasks.length === 0) return;
+    const Plotly = (window as any).Plotly;
+    if (!Plotly) return;
+    // Build cumulative start days
+    const starts: number[] = [];
+    let cursor = 0;
+    editTasks.forEach((t) => { starts.push(cursor); cursor += t.duration_days; });
+    const colorMap: Record<string, string> = { high: "#ef4444", medium: "#f59e0b", low: "#22c55e" };
+    const labels = editTasks.map((t) => (t.name.length > 35 ? t.name.slice(0, 33) + "…" : t.name));
+    Plotly.newPlot(
+      ganttRef.current,
+      [{
+        type: "bar",
+        orientation: "h",
+        x: editTasks.map((t) => t.duration_days),
+        y: labels,
+        base: starts,
+        marker: { color: editTasks.map((t) => colorMap[t.priority] ?? "#6366f1") },
+        hovertemplate: "<b>%{y}</b><br>Начало: день %{base}<br>Длительность: %{x} дн.<extra></extra>",
+        width: 0.6,
+      }],
+      {
+        xaxis: { title: "Дни", zeroline: false, gridcolor: "#e5e7eb" },
+        yaxis: { autorange: "reversed", gridcolor: "#e5e7eb" },
+        margin: { l: 200, r: 20, t: 10, b: 40 },
+        height: Math.max(180, editTasks.length * 38 + 80),
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "#f9fafb",
+        bargap: 0.35,
+        annotations: [
+          { x: 1.01, y: 1.05, xref: "paper", yref: "paper", text: "🔴 Высокий  🟡 Средний  🟢 Низкий", showarrow: false, font: { size: 10, color: "#6b7280" }, align: "right" }
+        ],
+      },
+      { displayModeBar: false, responsive: true }
+    );
+  }, [step, editTasks]);
+
+  // Hot deals
+  const [hotDeals, setHotDeals] = useState<any[]>([]);
+  const [hotDealsLoading, setHotDealsLoading] = useState(true);
+
+  const fetchHotDeals = () => {
+    setHotDealsLoading(true);
+    tenderAPI.getHotDeals()
+      .then((res) => setHotDeals(res.data))
+      .catch(() => {})
+      .finally(() => setHotDealsLoading(false));
+  };
+
   useEffect(() => {
     loadTenders();
+    fetchHotDeals();
   }, []);
 
   const loadTenders = async () => {
@@ -327,6 +412,113 @@ const TenderAnalyzer: React.FC = () => {
             </CardBody>
           </Card>
 
+          {/* ── Горячие тендеры ──────────────────────────────────────────── */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <span className="text-orange-500 text-xl">🔥</span>
+                <h3 className="text-lg font-medium text-gray-900">Горячие тендеры</h3>
+                <button
+                  onClick={fetchHotDeals}
+                  disabled={hotDealsLoading}
+                  className="ml-auto flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Обновить список тендеров"
+                >
+                  <svg
+                    className={`h-3.5 w-3.5 ${hotDealsLoading ? "animate-spin" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Обновить
+                </button>
+              </div>
+            </CardHeader>
+            <CardBody>
+              {hotDealsLoading ? (
+                <div className="text-center text-gray-400 py-6">Загрузка…</div>
+              ) : hotDeals.length === 0 ? (
+                <div className="text-center text-gray-400 py-6">Актуальных тендеров не найдено</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">№</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Наименование</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Заказчик</th>
+                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Сумма (₸)</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Дедлайн</th>
+                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Источник</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {hotDeals.map((deal, i) => {
+                        const daysLeft = deal.deadline
+                          ? Math.ceil((new Date(deal.deadline).getTime() - Date.now()) / 86_400_000)
+                          : null;
+                        return (
+                          <tr key={deal.id ?? i} className="hover:bg-orange-50 transition-colors">
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              {deal.url ? (
+                                <a
+                                  href={deal.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                                  title="Открыть на портале"
+                                >
+                                  {deal.number || `#${i + 1}`}
+                                </a>
+                              ) : (
+                                <span className="text-gray-500">{deal.number || `#${i + 1}`}</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 font-medium text-gray-900 max-w-xs">{deal.title}</td>
+                            <td className="px-4 py-3 text-gray-600 whitespace-nowrap max-w-[180px] truncate">{deal.company}</td>
+                            <td className="px-4 py-3 text-right font-semibold text-gray-900 whitespace-nowrap">
+                              {deal.amount_kzt
+                                ? new Intl.NumberFormat("ru-RU").format(deal.amount_kzt)
+                                : "—"}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              {deal.deadline ? (
+                                <span className={`inline-flex items-center gap-1 font-medium ${
+                                  daysLeft !== null && daysLeft <= 10 ? "text-red-600" :
+                                  daysLeft !== null && daysLeft <= 20 ? "text-yellow-600" :
+                                  "text-green-600"
+                                }`}>
+                                  {deal.deadline}
+                                  {daysLeft !== null && (
+                                    <span className="text-xs font-normal text-gray-400">
+                                      ({daysLeft}д)
+                                    </span>
+                                  )}
+                                </span>
+                              ) : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                                deal.source === "samruk"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : "bg-green-100 text-green-700"
+                              }`}>
+                                {deal.source === "samruk" ? "Самрук" : "Госзакуп"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+
           {/* Previous tenders */}
           {tenders.length > 0 && (
             <Card>
@@ -371,22 +563,19 @@ const TenderAnalyzer: React.FC = () => {
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               {t.status !== "accepted" && (
-                                <Button size="sm" onClick={() => handleReanalyze(t.id)}>
-                                  Analyze
-                                </Button>
+                                <>
+                                  <Button size="sm" onClick={() => handleReanalyze(t.id)}>
+                                    Analyze
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="danger"
+                                    onClick={() => handleDeleteTender(t.id)}
+                                  >
+                                    Delete
+                                  </Button>
+                                </>
                               )}
-                              {t.created_project_id && (
-                                <span className="text-sm text-green-600">
-                                  Project #{t.created_project_id}
-                                </span>
-                              )}
-                              <Button
-                                size="sm"
-                                variant="danger"
-                                onClick={() => handleDeleteTender(t.id)}
-                              >
-                                Delete
-                              </Button>
                             </div>
                           </td>
                         </tr>
@@ -502,18 +691,40 @@ const TenderAnalyzer: React.FC = () => {
             {/* Similar Projects */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-medium text-gray-900">Similar Projects</h3>
+                <h3 className="text-lg font-medium text-gray-900">Похожие проекты</h3>
               </CardHeader>
               <CardBody className="space-y-3">
                 {analysis.similar_projects.length === 0 ? (
-                  <p className="text-sm text-gray-500">No similar projects found.</p>
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-500">Аналогичных проектов не найдено</p>
+                    <p className="text-xs text-gray-400 mt-1">Расчёт выполнен по отраслевым нормативам</p>
+                  </div>
                 ) : (
                   analysis.similar_projects.map((sp, i) => (
-                    <div key={i} className="border rounded-lg p-3 bg-gray-50">
-                      <div className="flex justify-between items-start">
-                        <p className="text-sm font-medium text-gray-900">{sp.name}</p>
+                    <div
+                      key={i}
+                      className={`border rounded-lg p-3 ${
+                        i === 0
+                          ? "bg-blue-50 border-blue-200"
+                          : "bg-gray-50 border-gray-200"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          {i === 0 && (
+                            <p className="text-xs font-semibold text-blue-600 uppercase mb-0.5">
+                              Основной аналог
+                            </p>
+                          )}
+                          <p className="text-sm font-medium text-gray-900 leading-tight">{sp.name}</p>
+                          {i === 0 && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              На основе данного проекта построен ресурсный план
+                            </p>
+                          )}
+                        </div>
                         <span
-                          className={`text-xs font-bold px-2 py-1 rounded-full ${
+                          className={`shrink-0 text-xs font-bold px-2 py-1 rounded-full ${
                             sp.score >= 0.7
                               ? "bg-green-100 text-green-800"
                               : sp.score >= 0.4
@@ -521,56 +732,119 @@ const TenderAnalyzer: React.FC = () => {
                               : "bg-gray-100 text-gray-600"
                           }`}
                         >
-                          {(sp.score * 100).toFixed(0)}% match
+                          {(sp.score * 100).toFixed(0)}%
                         </span>
                       </div>
                     </div>
                   ))
                 )}
-                {analysis.confidence_score > 0 && (
-                  <div className="text-center mt-2">
-                    <span className="text-xs text-gray-500">
-                      Confidence: {(analysis.confidence_score * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                )}
               </CardBody>
             </Card>
 
-            {/* AI Reasoning — workforce estimate */}
+            {/* AI Confidence + Stats */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-medium text-gray-900">AI Analysis</h3>
+                <h3 className="text-lg font-medium text-gray-900">ИИ Уверенность</h3>
               </CardHeader>
               <CardBody>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-sm font-bold text-blue-800 mb-3 tracking-wide">
-                    ВСЕГО ЗАДЕЙСТВОВАНО:
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-base text-blue-900">
-                      <span className="font-bold text-lg">
-                        {(analysis.specialists_count || 0).toLocaleString("ru-RU")}
-                      </span>
-                      {" "}– специалистов
+                <div ref={gaugeRef} className="w-full" />
+                <p className="text-center text-xs text-gray-500 -mt-1 mb-3">
+                  {analysis.confidence_score >= 0.7
+                    ? "Высокая точность расчёта"
+                    : analysis.confidence_score >= 0.4
+                    ? "Средняя точность расчёта"
+                    : "Низкая точность — нет аналогов"}
+                </p>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-blue-50 rounded-lg p-2">
+                    <p className="text-lg font-bold text-blue-800">
+                      {(analysis.specialists_count || 0).toLocaleString("ru-RU")}
                     </p>
-                    <p className="text-base text-blue-900">
-                      <span className="font-bold text-lg">
-                        {(analysis.equipment_count || 0).toLocaleString("ru-RU")}
-                      </span>
-                      {" "}– единиц техники
+                    <p className="text-xs text-blue-600">специалистов</p>
+                  </div>
+                  <div className="bg-purple-50 rounded-lg p-2">
+                    <p className="text-lg font-bold text-purple-800">
+                      {(analysis.equipment_count || 0).toLocaleString("ru-RU")}
                     </p>
-                    <p className="text-base text-blue-900">
-                      <span className="font-bold text-lg">
-                        {(analysis.total_manhours || 0).toLocaleString("ru-RU")}
-                      </span>
-                      {" "}– чел/часов
+                    <p className="text-xs text-purple-600">ед. техники</p>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-2">
+                    <p className="text-lg font-bold text-green-800">
+                      {(analysis.total_manhours || 0).toLocaleString("ru-RU")}
                     </p>
+                    <p className="text-xs text-green-600">чел/часов</p>
                   </div>
                 </div>
               </CardBody>
             </Card>
           </div>
+
+          {/* ── AI Reasoning Panel ───────────────────────────────────────── */}
+          {analysis.reasoning && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100">
+                    <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Методология расчёта</h3>
+                  <span className="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full font-medium">ИИ объяснение</span>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Reasoning text */}
+                  <div className="lg:col-span-2">
+                    <div className="bg-indigo-50 border-l-4 border-indigo-400 rounded-r-lg p-4">
+                      <p className="text-xs font-semibold text-indigo-500 uppercase mb-2">Логика ИИ</p>
+                      <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+                        {analysis.reasoning}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Key derivation story */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase">Как получен план</p>
+                    <div className="space-y-2">
+                      {analysis.similar_projects.length > 0 && (
+                        <div className="flex items-start gap-2 bg-blue-50 rounded-lg p-3">
+                          <span className="text-blue-500 text-lg leading-none mt-0.5">①</span>
+                          <div>
+                            <p className="text-xs font-medium text-blue-800">Найден аналог</p>
+                            <p className="text-xs text-blue-600 mt-0.5">
+                              «{analysis.similar_projects[0].name}»<br />
+                              совпадение {(analysis.similar_projects[0].score * 100).toFixed(0)}%
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex items-start gap-2 bg-purple-50 rounded-lg p-3">
+                        <span className="text-purple-500 text-lg leading-none mt-0.5">②</span>
+                        <div>
+                          <p className="text-xs font-medium text-purple-800">Масштабирование</p>
+                          <p className="text-xs text-purple-600 mt-0.5">
+                            Ресурсы скорректированы под объём и специфику нового тендера
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 bg-green-50 rounded-lg p-3">
+                        <span className="text-green-500 text-lg leading-none mt-0.5">③</span>
+                        <div>
+                          <p className="text-xs font-medium text-green-800">Итоговый план</p>
+                          <p className="text-xs text-green-600 mt-0.5">
+                            {editResources.length} ресурсов · {editTasks.length} задач<br />
+                            {formatCost(calcTotal(editResources))}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          )}
 
           {/* ── Editable Resource Plan ───────────────────────────────────── */}
           <Card>
@@ -798,6 +1072,35 @@ const TenderAnalyzer: React.FC = () => {
               </div>
             </CardBody>
           </Card>
+
+          {/* ── Gantt Timeline ───────────────────────────────────────────── */}
+          {editTasks.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100">
+                    <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900">Календарный план</h3>
+                  <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">Gantt</span>
+                  <span className="ml-auto text-sm text-gray-500">
+                    Итого:{" "}
+                    <span className="font-bold text-gray-900">
+                      {editTasks.reduce((s, t) => s + t.duration_days, 0)} дн.
+                    </span>
+                  </span>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div ref={ganttRef} className="w-full" />
+                <p className="text-xs text-gray-400 mt-2 text-center">
+                  * Задачи показаны последовательно. Фактический план может быть скорректирован.
+                </p>
+              </CardBody>
+            </Card>
+          )}
 
           {/* ── Accept Section ───────────────────────────────────────────── */}
           <Card>

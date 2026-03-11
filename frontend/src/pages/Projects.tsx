@@ -5,6 +5,7 @@ import Input from "../components/Input";
 import Select from "../components/Select";
 import TextArea from "../components/TextArea";
 import Button from "../components/Button";
+import ProjectDetailModal from "../components/ProjectDetailModal";
 import { exportToCSV } from '../utils/export';
 import { projectsAPI, Project } from "../services/API";
 
@@ -386,103 +387,13 @@ const Projects: React.FC = () => {
       </Modal>
 
       {/* Project Detail Modal */}
-      <Modal
+      <ProjectDetailModal
+        project={selectedProject}
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
-        title={selectedProject?.name || "Project Details"}
-        size="xl"
-      >
-        {selectedProject && (
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Description</h4>
-              <p className="mt-1 text-gray-900">{selectedProject.description || "No description"}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Status</h4>
-                <span
-                  className={`mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedProject.status)}`}
-                >
-                  {selectedProject.status.replace("_", " ")}
-                </span>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Location</h4>
-                <p className="mt-1 text-gray-900">{selectedProject.location || "N/A"}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Start Date</h4>
-                <p className="mt-1 text-gray-900">{formatDate(selectedProject.start_date)}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Planned End Date</h4>
-                <p className="mt-1 text-gray-900">{formatDate(selectedProject.planned_end_date)}</p>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Budget Information</h4>
-              <div className="mt-2 space-y-2">
-                <div className="flex justify-between">
-                  <span>Total Budget:</span>
-                  <span className="font-semibold">{formatCurrency(selectedProject.total_budget)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Spent Amount:</span>
-                  <span className="font-semibold">{formatCurrency(selectedProject.spent_amount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Remaining:</span>
-                  <span className="font-semibold">{formatCurrency(selectedProject.remaining_budget)}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${
-                      selectedProject.budget_utilization > 90
-                        ? "bg-red-500"
-                        : selectedProject.budget_utilization > 75
-                          ? "bg-yellow-500"
-                          : "bg-green-500"
-                    }`}
-                    style={{
-                      width: `${Math.min(selectedProject.budget_utilization, 100)}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="text-sm text-gray-500 text-right">
-                  {selectedProject.budget_utilization.toFixed(1)}% utilized
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3 pt-4 border-t">
-              <Button
-                variant="secondary"
-                onClick={() => setIsDetailModalOpen(false)}
-              >
-                Close
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => openEditModal(selectedProject)}
-              >
-                Edit Project
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => handleDelete(selectedProject.id)}
-              >
-                Delete Project
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
+        onEdit={openEditModal}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };

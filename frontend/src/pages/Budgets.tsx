@@ -296,8 +296,12 @@ const Budgets: React.FC = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {projects.find((p) => p.id === budget.project_id)?.name ||
-                    `Project #${budget.project_id}`}
+                  <div
+                    className="max-w-[160px] truncate"
+                    title={projects.find((p) => p.id === budget.project_id)?.name || `Project #${budget.project_id}`}
+                  >
+                    {projects.find((p) => p.id === budget.project_id)?.name || `Project #${budget.project_id}`}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="text-gray-600 max-w-xs truncate">

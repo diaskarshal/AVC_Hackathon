@@ -220,6 +220,11 @@ export const analyticsAPI = {
     api.get<{ team_members: number; performance: TeamPerformance[] }>(
       `/api/analytics/team-performance${projectId ? `?project_id=${projectId}` : ""}`
     ),
+  getCharts: () => api.get("/api/analytics/charts"),
+};
+
+export const tenderAPI = {
+  getHotDeals: () => api.get("/api/tender/hot-deals"),
 };
 
 export const importAPI = {

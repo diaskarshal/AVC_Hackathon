@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Card, CardHeader, CardBody } from "../Card";
 import { DashboardStats } from "../../services/API";
+import ChartsSection from "./ChartsSection";
 
 interface AdminDashboardProps {
   stats: DashboardStats;
@@ -14,21 +14,44 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Complete overview of all projects and resources
-          </p>
+      {/* AVC GROUP company banner */}
+      <div className="rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 px-6 py-5 text-white shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white">
+                <span className="text-primary-700 font-black text-sm">AVC</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold leading-none">AVC GROUP</h1>
+                <p className="text-primary-200 text-xs font-medium tracking-widest uppercase mt-0.5">BuildFlow — система управления ремонтами</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-black">1 000+</p>
+              <p className="text-primary-200 text-xs leading-tight">сотрудников<br />в штате</p>
+            </div>
+            <div className="border-l border-primary-400 pl-4">
+              <p className="text-2xl font-black">150+</p>
+              <p className="text-primary-200 text-xs leading-tight">квалиф.<br />ИТР</p>
+            </div>
+            <div className="border-l border-primary-400 pl-4">
+              <p className="text-2xl font-black">47+</p>
+              <p className="text-primary-200 text-xs leading-tight">установок<br />АНПЗ · ПНХЗ</p>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={onRefresh}
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-        >
-          Refresh
-        </button>
+      </div>
+
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Admin Dashboard
+        </h1>
+        <p className="text-gray-600 mt-1">
+          Complete overview of all projects and resources
+        </p>
       </div>
 
       {/* Stats Grid */}
@@ -181,42 +204,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Quick Actions
-          </h3>
-        </CardHeader>
-        <CardBody>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <Link
-              to="/projects"
-              className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
-            >
-              Manage Projects
-            </Link>
-            <Link
-              to="/tasks"
-              className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              View All Tasks
-            </Link>
-            <Link
-              to="/import"
-              className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-            >
-              Import Data
-            </Link>
-            <Link
-              to="/users"
-              className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
-            >
-              Manage Users
-            </Link>
-          </div>
-        </CardBody>
-      </Card>
+      {/* Plotly KPI Charts */}
+      <ChartsSection />
 
       {/* System Health */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">

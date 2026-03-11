@@ -62,9 +62,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="flex items-center">
               <Link
                 to="/"
-                className="flex-shrink-0 text-white text-xl font-bold"
+                className="flex-shrink-0 flex items-center gap-2"
               >
-                BuildFlow
+                <div className="flex items-center justify-center w-8 h-8 rounded bg-white">
+                  <span className="text-primary-700 font-black text-xs leading-none">AVC</span>
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className="text-white font-bold text-base">BuildFlow</span>
+                  <span className="text-primary-200 text-[10px] font-medium tracking-widest uppercase">AVC GROUP</span>
+                </div>
               </Link>
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">

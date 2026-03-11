@@ -14,6 +14,23 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 }) => {
   return (
     <div className="space-y-6">
+      {/* AVC GROUP company banner */}
+      <div className="rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 px-6 py-4 text-white shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white shrink-0">
+            <span className="text-primary-700 font-black text-sm">AVC</span>
+          </div>
+          <div>
+            <p className="font-bold text-lg leading-none">AVC GROUP</p>
+            <p className="text-primary-200 text-xs font-medium tracking-widest uppercase mt-0.5">BuildFlow — система управления ремонтами</p>
+          </div>
+          <div className="ml-auto hidden sm:flex gap-6 text-center">
+            <div><p className="text-xl font-black">АНПЗ</p><p className="text-primary-200 text-xs">Атырауский НПЗ</p></div>
+            <div className="border-l border-primary-400 pl-6"><p className="text-xl font-black">ПНХЗ</p><p className="text-primary-200 text-xs">Павлодарский НХЗ</p></div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">

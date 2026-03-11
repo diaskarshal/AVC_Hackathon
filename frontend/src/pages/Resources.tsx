@@ -298,7 +298,12 @@ const Resources: React.FC = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {projects.find((p) => p.id === resource.project_id)?.name || `Project #${resource.project_id}`}
+                  <div
+                    className="max-w-[160px] truncate"
+                    title={projects.find((p) => p.id === resource.project_id)?.name || `Project #${resource.project_id}`}
+                  >
+                    {projects.find((p) => p.id === resource.project_id)?.name || `Project #${resource.project_id}`}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <span className="capitalize">{resource.resource_type}</span>

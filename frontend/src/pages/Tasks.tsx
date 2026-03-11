@@ -326,7 +326,10 @@ const Tasks: React.FC = () => {
                   )}
                 </TableCell>
                 <TableCell>
-                  <div className="text-gray-900">
+                  <div
+                    className="text-gray-900 max-w-[160px] truncate"
+                    title={projects.find((p) => p.id === task.project_id)?.name || `Project #${task.project_id}`}
+                  >
                     {projects.find((p) => p.id === task.project_id)?.name || `Project #${task.project_id}`}
                   </div>
                 </TableCell>

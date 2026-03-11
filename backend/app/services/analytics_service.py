@@ -286,6 +286,41 @@ class AnalyticsService:
             )
         }
 
+    def get_charts_data(self) -> Dict:
+        projects = self.db.query(Project).all()
+
+        plant_counts: Dict[str, int] = {}
+        status_counts: Dict[str, int] = {}
+        budget_per_project = []
+
+        for project in projects:
+            location = project.location or ""
+            if "АНПЗ" in location:
+                plant = "АНПЗ"
+            elif "МНПЗ" in location:
+                plant = "МНПЗ"
+            elif "ПНХЗ" in location or "Павлодар" in location:
+                plant = "ПНХЗ"
+            else:
+                plant = "Другое"
+            plant_counts[plant] = plant_counts.get(plant, 0) + 1
+
+            s = project.status.value
+            status_counts[s] = status_counts.get(s, 0) + 1
+
+            short_name = (project.name[:28] + "…") if len(project.name) > 28 else project.name
+            budget_per_project.append({
+                "name": short_name,
+                "budget": round(project.total_budget / 1_000_000, 2),
+                "spent": round(project.spent_amount / 1_000_000, 2),
+            })
+
+        return {
+            "projects_by_plant": [{"label": k, "value": v} for k, v in plant_counts.items()],
+            "projects_by_status": [{"label": k, "value": v} for k, v in status_counts.items()],
+            "budget_vs_spent": budget_per_project,
+        }
+
     def get_team_performance(self, project_id: int = None) -> Dict:
         from sqlalchemy import case
         
