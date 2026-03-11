@@ -32,5 +32,8 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
 
+    GEMINI_API_KEY: str="REDACTED"
+    GROQ_API_KEY: str="REDACTED"
+
 
 settings = Settings()

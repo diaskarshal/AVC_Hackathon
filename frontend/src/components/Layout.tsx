@@ -31,6 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: "/team-performance", label: "Team" },
         { path: "/users", label: "Users" },
         { path: "/import", label: "Import" },
+        { path: "/tender", label: "Tender" },
       ];
     } else if (user.role === "manager") {
       return [
@@ -40,6 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { path: "/resources", label: "Resources" },
         { path: "/budgets", label: "Budgets" },
         { path: "/team-performance", label: "Team" },
+        { path: "/tender", label: "Tender" },
       ];
     } else {
       return [

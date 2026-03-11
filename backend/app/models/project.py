@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Enum, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -37,6 +37,9 @@ class Project(Base):
     resources = relationship("Resource", back_populates="project", cascade="all, delete-orphan")
     budgets = relationship("Budget", back_populates="project", cascade="all, delete-orphan")
     
+    embedding = Column(JSON, nullable=True)   # Precomputed 384-dim vector
+    embedding_text = Column(Text, nullable=True)  # The text that was embedded
+
     @property
     def budget_utilization(self):
         if self.total_budget == 0:

@@ -13,6 +13,7 @@ import Import from "./pages/Import";
 import Users from "./pages/Users";
 import Profile from "./pages/Profile";
 import TeamPerformance from "./pages/TeamPerformance";
+import TenderAnalyzer from "./pages/TenderAnalyzer";
 
 function App() {
   return (
@@ -135,6 +136,16 @@ function App() {
               <PrivateRoute allowedRoles={["admin"]}>
                 <Layout>
                   <Import />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tender"
+            element={
+              <PrivateRoute allowedRoles={["admin", "manager"]}>
+                <Layout>
+                  <TenderAnalyzer />
                 </Layout>
               </PrivateRoute>
             }

@@ -12,6 +12,7 @@ from app.routes import (
     budgets,
     analytics,
     import_data,
+    tender,
 )
 from app.middleware.error_handler import add_exception_handlers
 
@@ -50,6 +51,7 @@ app.include_router(
     analytics.router, prefix="/api/analytics", tags=["Analytics"]
 )
 app.include_router(import_data.router, prefix="/api/import", tags=["Import"])
+app.include_router(tender.router, prefix="/api/tender", tags=["Tender Analysis"])
 
 
 @app.get("/")

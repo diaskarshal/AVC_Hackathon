@@ -5,14 +5,6 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg)](https://fastapi.tiangolo.com)
 [![React 19](https://img.shields.io/badge/React-19.2.0-61DAFB.svg)](https://reactjs.org/)
 
-
-todo:
-- workers should be shown the tasks their team assigned to, not the whole tasks.
-- use patch(1 field - status) instead of put(updates all fields) in the workers' tasks update modal  
-- «Автоматизация расчёта ресурсов для ремонта заводского оборудования» (Data Science / Аналитика);  
-- Применение инновационных методов в управлении ресурсами при ремонтах заводов;  
-- форма завершения: Авт. расчет ресурсов с использованием истор. данных и LLM.  
-
 **BuildFlow** -- ERP system designed for construction project management.
 
 ![BuildFlow Dashboard](docs/dashboard.png)

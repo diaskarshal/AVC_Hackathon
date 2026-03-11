@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.database import get_db
 from app.models.project import Project
+from app.models.tender import Tender
 from app.schemas.project import (
     ProjectCreate,
     ProjectUpdate,
@@ -121,6 +122,12 @@ async def update_project(
     dependencies=[Depends(require_role("admin"))],  # Admin only
 )
 async def delete_project(project_id: int, db: Session = Depends(get_db)):
+    # Nullify tender FK references before deleting the project
+    db.query(Tender).filter(Tender.created_project_id == project_id).update(
+        {"created_project_id": None}
+    )
+    db.commit()
+
     service = ProjectService(db)
     success = service.delete_project(project_id)
     
