@@ -25,7 +25,7 @@ const Users: React.FC = () => {
       setUsers(response.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch users");
+      setError(err.message || "Ошибка загрузки пользователей");
     } finally {
       setLoading(false);
     }
@@ -44,11 +44,20 @@ const Users: React.FC = () => {
     }
   };
 
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "admin": return "Администратор";
+      case "manager": return "Менеджер";
+      case "worker": return "Сотрудник";
+      default: return role;
+    }
+  };
+
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading users...</div>
+        <div className="text-gray-500">Загрузка...</div>
       </div>
     );
   }
@@ -56,7 +65,7 @@ const Users: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
+        Ошибка: {error}
       </div>
     );
   }
@@ -69,16 +78,16 @@ const Users: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Управление пользователями</h1>
           <p className="text-gray-600 mt-1">
-            Manage system users and their roles
+            Управление пользователями системы и их ролями
           </p>
         </div>
         <button
           onClick={fetchUsers}
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
         >
-          Refresh
+          Обновить
         </button>
       </div>
 
@@ -86,7 +95,7 @@ const Users: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Users</div>
+            <div className="text-sm text-gray-500">Всего пользователей</div>
             <div className="text-2xl font-bold text-gray-900">
               {users.length}
             </div>
@@ -94,7 +103,7 @@ const Users: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Administrators</div>
+            <div className="text-sm text-gray-500">Администраторы</div>
             <div className="text-2xl font-bold text-red-600">
               {adminUsers.length}
             </div>
@@ -102,7 +111,7 @@ const Users: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Managers</div>
+            <div className="text-sm text-gray-500">Менеджеры</div>
             <div className="text-2xl font-bold text-blue-600">
               {managerUsers.length}
             </div>
@@ -110,7 +119,7 @@ const Users: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Workers</div>
+            <div className="text-sm text-gray-500">Сотрудники</div>
             <div className="text-2xl font-bold text-green-600">
               {workerUsers.length}
             </div>
@@ -122,15 +131,15 @@ const Users: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            ADMIN
+            Администраторы
           </h3>
         </CardHeader>
         <Table>
           <TableHeader>
-            <TableHead>User</TableHead>
-            <TableHead>Username</TableHead>
+            <TableHead>Пользователь</TableHead>
+            <TableHead>Логин</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
+            <TableHead>Роль</TableHead>
           </TableHeader>
           <TableBody>
             {adminUsers.map((user) => (
@@ -151,7 +160,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {user.role}
+                    {getRoleLabel(user.role)}
                   </span>
                 </TableCell>
               </tr>
@@ -164,16 +173,16 @@ const Users: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Project Managers
+            Менеджеры проектов
           </h3>
         </CardHeader>
         <Table>
           <TableHeader>
-            <TableHead>User</TableHead>
-            <TableHead>Username</TableHead>
+            <TableHead>Пользователь</TableHead>
+            <TableHead>Логин</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Managed Projects</TableHead>
-            <TableHead>Role</TableHead>
+            <TableHead>Проекты</TableHead>
+            <TableHead>Роль</TableHead>
           </TableHeader>
           <TableBody>
             {managerUsers.map((user) => (
@@ -193,11 +202,11 @@ const Users: React.FC = () => {
                 <TableCell>
                   {user.managed_projects && user.managed_projects.length > 0 ? (
                     <span className="text-sm text-gray-600">
-                      {user.managed_projects.length} project(s)
+                      {user.managed_projects.length} проект(ов)
                     </span>
                   ) : (
                     <span className="text-sm text-gray-400">
-                      No projects assigned
+                      Нет проектов
                     </span>
                   )}
                 </TableCell>
@@ -205,7 +214,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {user.role}
+                    {getRoleLabel(user.role)}
                   </span>
                 </TableCell>
               </tr>
@@ -218,16 +227,16 @@ const Users: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Workers
+            Сотрудники
           </h3>
         </CardHeader>
         <Table>
           <TableHeader>
-            <TableHead>User</TableHead>
-            <TableHead>Username</TableHead>
+            <TableHead>Пользователь</TableHead>
+            <TableHead>Логин</TableHead>
             <TableHead>Email</TableHead>
-            <TableHead>Worker Name</TableHead>
-            <TableHead>Role</TableHead>
+            <TableHead>Имя сотрудника</TableHead>
+            <TableHead>Роль</TableHead>
           </TableHeader>
           <TableBody>
             {workerUsers.map((user) => (
@@ -253,7 +262,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {user.role}
+                    {getRoleLabel(user.role)}
                   </span>
                 </TableCell>
               </tr>

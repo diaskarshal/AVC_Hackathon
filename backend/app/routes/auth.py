@@ -51,6 +51,16 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     return current_user
 
 
+@router.post("/refresh")
+async def refresh_token(current_user: dict = Depends(get_current_user)):
+    """Re-issue a fresh token for an authenticated user (silent refresh)."""
+    access_token = create_access_token(
+        data={"sub": current_user["username"], "role": current_user["role"]},
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 @router.get("/demo-users")
 async def get_demo_users():
     from app.auth.demo_users import DEMO_USERS, _DEMO_USER_PASSWORDS

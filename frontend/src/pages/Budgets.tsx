@@ -44,7 +44,7 @@ const Budgets: React.FC = () => {
       setBudgets(response.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch budgets");
+      setError(err.message || "Ошибка загрузки");
     } finally {
       setLoading(false);
     }
@@ -87,19 +87,19 @@ const Budgets: React.FC = () => {
       resetForm();
       fetchBudgets();
     } catch (err: any) {
-      alert(err.message || "Failed to save budget");
+      alert(err.message || "Ошибка сохранения");
     }
   };
 
   const handleDelete = async (id: number) => {
     if (
-      window.confirm("Are you sure you want to delete this budget entry?")
+      window.confirm("Удалить эту запись бюджета?")
     ) {
       try {
         await budgetsAPI.delete(id);
         fetchBudgets();
       } catch (err: any) {
-        alert(err.message || "Failed to delete budget");
+        alert(err.message || "Ошибка удаления");
       }
     }
   };
@@ -174,7 +174,7 @@ const Budgets: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading budgets...</div>
+        <div className="text-gray-500">Загрузка...</div>
       </div>
     );
   }
@@ -182,7 +182,7 @@ const Budgets: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
+        Ошибка: {error}
       </div>
     );
   }
@@ -353,7 +353,7 @@ const Budgets: React.FC = () => {
         </Table>
         {filteredBudgets.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            No budget entries found
+            Записи бюджета не найдены
           </div>
         )}
       </Card>
@@ -365,16 +365,16 @@ const Budgets: React.FC = () => {
           setIsModalOpen(false);
           resetForm();
         }}
-        title={editingBudget ? "Edit Budget Entry" : "Add Budget Entry"}
+        title={editingBudget ? "Редактировать запись" : "Добавить запись бюджета"}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label="Project"
+            label="Проект"
             name="project_id"
             value={formData.project_id}
             onChange={handleInputChange}
             options={[
-              { value: "", label: "Select a project" },
+              { value: "", label: "Выберите проект" },
               ...projects.map((p) => ({
                 value: p.id.toString(),
                 label: p.name,
@@ -384,16 +384,16 @@ const Budgets: React.FC = () => {
           />
 
           <Input
-            label="Category"
+            label="Категория"
             name="category"
             value={formData.category}
             onChange={handleInputChange}
-            placeholder="e.g., Materials, Labor, Equipment"
+            placeholder="Материалы, Труд, Оборудование..."
             required
           />
 
           <TextArea
-            label="Description"
+            label="Описание"
             name="description"
             value={formData.description}
             onChange={handleInputChange}
@@ -402,7 +402,7 @@ const Budgets: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Planned Amount"
+              label="Плановая сумма"
               type="number"
               name="planned_amount"
               value={formData.planned_amount}
@@ -412,7 +412,7 @@ const Budgets: React.FC = () => {
             />
 
             <Input
-              label="Actual Amount"
+              label="Фактическая сумма"
               type="number"
               name="actual_amount"
               value={formData.actual_amount}
@@ -424,7 +424,7 @@ const Budgets: React.FC = () => {
 
           <div className="bg-gray-50 px-4 py-3 rounded">
             <div className="text-sm text-gray-600">
-              Variance:{" "}
+              Отклонение:{" "}
               <span
                 className={`font-semibold ${getVarianceColor(
                   parseFloat(formData.planned_amount.toString()) -
@@ -448,10 +448,10 @@ const Budgets: React.FC = () => {
                 resetForm();
               }}
             >
-              Cancel
+              Отмена
             </Button>
             <Button type="submit">
-              {editingBudget ? "Update Budget" : "Add Budget"}
+              {editingBudget ? "Сохранить" : "Добавить"}
             </Button>
           </div>
         </form>

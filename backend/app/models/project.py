@@ -29,6 +29,7 @@ class Project(Base):
     spent_amount = Column(Float, default=0.0)
     
     location = Column(String(255))
+    customer = Column(String(255), nullable=True)  # Заказчик (shortened, e.g. "АНПЗ")
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

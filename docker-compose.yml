@@ -2,10 +2,11 @@ services:
   db:
     image: postgres:15-alpine
     container_name: buildflow_db
+    env_file: .env
     environment:
-      POSTGRES_USER: buildflow
-      POSTGRES_PASSWORD: buildflow123
-      POSTGRES_DB: buildflow_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -23,10 +24,12 @@ services:
     container_name: buildflow_backend
     ports:
       - "8001:8000"
+    env_file: .env
     environment:
-      - DATABASE_URL=postgresql://buildflow:buildflow123@db:5432/buildflow_db
-      - GEMINI_API_KEY=REDACTED
-      - GROQ_API_KEY=REDACTED
+      - DATABASE_URL=${DATABASE_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -48,7 +51,7 @@ services:
       - ./frontend/public:/app/public
       - /app/node_modules
     environment:
-      - REACT_APP_API_URL=http://localhost:8001
+      - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8001}
       - CHOKIDAR_USEPOLLING=true
       - WDS_SOCKET_PORT=3000
 

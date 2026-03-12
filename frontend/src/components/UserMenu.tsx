@@ -54,14 +54,14 @@ const UserMenu: React.FC = () => {
               onClick={() => setIsOpen(false)}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              My Profile
+              Мой профиль
             </Link>
             
             <button
               onClick={logout}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Logout
+              Выход
             </button>
           </div>
         </>

@@ -1,10 +1,92 @@
+import re
 import pdfplumber
 import pandas as pd
 import io
 from typing import Optional, List
 
+# Full name → abbreviation for Kazakh petroleum industry customers
+COMPANY_SHORTCUTS: dict = {
+    "АТЫРАУСКИЙ НЕФТЕПЕРЕРАБАТЫВАЮЩИЙ ЗАВОД": "АНПЗ",
+    "АТЫРАУСКИЙ НПЗ": "АНПЗ",
+    "АТЫРАУ НПЗ": "АНПЗ",
+    "ПАВЛОДАРСКИЙ НЕФТЕХИМИЧЕСКИЙ ЗАВОД": "ПНХЗ",
+    "ПАВЛОДАРСКИЙ НХЗ": "ПНХЗ",
+    "КАЗАХСТАН ПЕТРОКЕМИКАЛ ИНДАСТРИЗ": "KPI",
+    "KAZAKHSTAN PETROCHEMICAL INDUSTRIES": "KPI",
+    "МАНГИСТАУСКИЙ НЕФТЕПЕРЕРАБАТЫВАЮЩИЙ ЗАВОД": "МНПЗ",
+    "МАНГИСТАУСКИЙ НПЗ": "МНПЗ",
+    "ШЫМКЕНТСКИЙ НЕФТЕПЕРЕРАБАТЫВАЮЩИЙ ЗАВОД": "ПКОП",
+    "PETRO KAZAKHSTAN OIL PRODUCTS": "ПКОП",
+}
+
+
+def shorten_company(name: str) -> str:
+    """Return known abbreviation for a Kazakh company name, or the original."""
+    if not name:
+        return name
+    upper = name.upper()
+    for long_name, short in COMPANY_SHORTCUTS.items():
+        if long_name in upper:
+            return short
+    return name
+
+
+def extract_city(location_text: str) -> str:
+    """Extract just the city name from a verbose Kazakh government address string.
+
+    Example input:
+        'КАЗАХСТАН, Атырауская область, город Атырау, проспект Зейнолла Кабдолова, строение 1'
+    Output: 'Атырау'
+    """
+    if not location_text or len(location_text.strip()) <= 30:
+        return location_text.strip()
+
+    text = location_text.replace("\n", " ")
+
+    # Pattern 1: "город <City>"
+    m = re.search(r'город\s+([А-ЯЁа-яёA-Za-z][А-ЯЁа-яё\-A-Za-z]*)', text, re.IGNORECASE)
+    if m:
+        return m.group(1).capitalize()
+
+    # Pattern 2: "г. <City>"
+    m = re.search(r'г\.\s*([А-ЯЁа-яёA-Za-z][А-ЯЁа-яё\-A-Za-z]*)', text, re.IGNORECASE)
+    if m:
+        return m.group(1).capitalize()
+
+    # Pattern 3: walk comma-separated parts, pick first that looks like a standalone city name
+    parts = [p.strip() for p in text.split(",") if p.strip()]
+    for part in parts:
+        if re.search(r'\bобласть\b|\bрайон\b|КАЗАХСТАН|KAZAKHSTAN', part, re.IGNORECASE):
+            continue
+        # Single word starting with capital, >3 chars — likely a city
+        if re.match(r'^[А-ЯЁA-Z][а-яёa-z\-]{3,}$', part):
+            return part
+
+    return location_text.strip()
+
 
 class TenderParserService:
+
+    def _extract_procurement_title(self, raw_text: str) -> str:
+        """
+        Extract the procurement name (наименование закупки) from raw text.
+
+        In Samruk-Kazyna PDFs the structure is:
+            Работы по ремонту печи П-1        ← this is what we want
+            (наименование закупки)             ← marker
+
+        We look for the Russian or Kazakh marker and return the last
+        non-empty line that precedes it.
+        """
+        for marker in ["(наименование закупки)", "(сатып алу атауы)"]:
+            idx = raw_text.lower().find(marker.lower())
+            if idx == -1:
+                continue
+            before = raw_text[:idx].strip()
+            lines = [ln.strip() for ln in before.split("\n") if ln.strip()]
+            if lines:
+                return lines[-1]
+        return ""
 
     def parse_pdf(self, file_bytes: bytes) -> str:
         """
@@ -16,6 +98,8 @@ class TenderParserService:
            ("Номер лота" marks the start of the Russian lot table)
         3. Always put the relevant content FIRST so it lands within the LLM's
            character window.
+        4. Always prepend 'НАИМЕНОВАНИЕ ЗАКУПКИ: ...' so the LLM uses the
+           correct project title rather than the generic lot category column.
         """
         all_page_texts: List[str] = []
         all_table_sections: List[str] = []
@@ -35,26 +119,32 @@ class TenderParserService:
 
         full_raw = "\n\n".join(all_page_texts)
 
+        # Extract the procurement title and prepend as a clearly labelled line
+        # so the LLM picks it up even if the preamble slice doesn't contain it.
+        procurement_title = self._extract_procurement_title(full_raw)
+        title_header = (
+            f"НАИМЕНОВАНИЕ ЗАКУПКИ: {procurement_title}\n\n"
+            if procurement_title else ""
+        )
+
         # ── Case 1: structured Samruk table found ─────────────────────────
         samruk = [t for t in all_table_sections if "ТЕНДЕРНЫЕ ЛОТЫ" in t]
         if samruk:
-            # Prepend procurement title extracted from raw text (first ~300 chars)
             preamble = full_raw[:300]
-            return preamble + "\n\n" + "\n\n".join(samruk)
+            return title_header + preamble + "\n\n" + "\n\n".join(samruk)
 
         # ── Case 2: no structured table — find the Russian section in raw text
         # The Russian version contains "Номер лота" (Kazakh has "Лот нөмірі")
         russian_start = full_raw.find("Номер лота")
         if russian_start == -1:
-            # Try alternate Russian marker
             russian_start = full_raw.find("Наименование и краткая")
         if russian_start > 0:
             preamble = full_raw[:400]
             russian_section = full_raw[russian_start:]
-            return preamble + "\n\n" + russian_section
+            return title_header + preamble + "\n\n" + russian_section
 
         # ── Case 3: plain fallback
-        return full_raw
+        return title_header + full_raw
 
     def _format_table(self, table: list) -> str:
         """

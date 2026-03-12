@@ -26,6 +26,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (!authState.isAuthenticated) return;
+    const REFRESH_INTERVAL = 60 * 60 * 1000;
+    const timer = setInterval(async () => {
+      try {
+        const res = await authAPI.refresh();
+        const newToken: string = res.data.access_token;
+        localStorage.setItem("token", newToken);
+        setAuthState((prev) => ({ ...prev, token: newToken }));
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setAuthState({ user: null, token: null, isAuthenticated: false, isLoading: false });
+      }
+    }, REFRESH_INTERVAL);
+    return () => clearInterval(timer);
+  }, [authState.isAuthenticated]);
+
   const checkAuth = async () => {
     const token = localStorage.getItem("token");
     const userStr = localStorage.getItem("user");

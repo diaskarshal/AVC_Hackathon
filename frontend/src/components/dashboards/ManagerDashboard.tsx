@@ -14,37 +14,20 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      {/* AVC GROUP company banner */}
-      <div className="rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 px-6 py-4 text-white shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white shrink-0">
-            <span className="text-primary-700 font-black text-sm">AVC</span>
-          </div>
-          <div>
-            <p className="font-bold text-lg leading-none">AVC GROUP</p>
-            <p className="text-primary-200 text-xs font-medium tracking-widest uppercase mt-0.5">BuildFlow — система управления ремонтами</p>
-          </div>
-          <div className="ml-auto hidden sm:flex gap-6 text-center">
-            <div><p className="text-xl font-black">АНПЗ</p><p className="text-primary-200 text-xs">Атырауский НПЗ</p></div>
-            <div className="border-l border-primary-400 pl-6"><p className="text-xl font-black">ПНХЗ</p><p className="text-primary-200 text-xs">Павлодарский НХЗ</p></div>
-          </div>
-        </div>
-      </div>
-
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Manager Dashboard
+            Дашборд менеджера
           </h1>
           <p className="text-gray-600 mt-1">
-            Manage your assigned projects and team
+            Управление назначенными проектами и командой
           </p>
         </div>
         <button
           onClick={onRefresh}
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
         >
-          Refresh
+          Обновить
         </button>
       </div>
 
@@ -71,7 +54,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    My Projects
+                    Мои проекты
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.total_projects}
@@ -80,7 +63,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              {stats.active_projects} active
+              {stats.active_projects} активных
             </div>
           </CardBody>
         </Card>
@@ -106,7 +89,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Budget
+                    Бюджет
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.budget_utilization.toFixed(0)}%
@@ -115,7 +98,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              ₸{(stats.total_spent / 1000000).toFixed(1)}M spent
+              ₸{(stats.total_spent / 1000000).toFixed(1)}M освоено
             </div>
           </CardBody>
         </Card>
@@ -141,7 +124,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Tasks
+                    Задачи
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.total_tasks}
@@ -150,7 +133,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              {stats.task_completion_rate.toFixed(0)}% complete
+              {stats.task_completion_rate.toFixed(0)}% выполнено
             </div>
           </CardBody>
         </Card>
@@ -176,7 +159,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Issues
+                    Проблемы
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.overdue_tasks}
@@ -184,7 +167,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 </dl>
               </div>
             </div>
-            <div className="mt-2 text-sm text-gray-500">Overdue tasks</div>
+            <div className="mt-2 text-sm text-gray-500">Просроченные задачи</div>
           </CardBody>
         </Card>
       </div>
@@ -193,7 +176,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Quick Actions
+            Быстрые действия
           </h3>
         </CardHeader>
         <CardBody>
@@ -202,19 +185,19 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               to="/projects"
               className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
             >
-              View Projects
+              Проекты
             </Link>
             <Link
               to="/tasks"
               className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
             >
-              Manage Tasks
+              Задачи
             </Link>
             <Link
               to="/resources"
               className="flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
             >
-              Track Resources
+              Ресурсы
             </Link>
           </div>
         </CardBody>
@@ -225,14 +208,14 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         <Card>
           <CardHeader>
             <h3 className="text-lg font-medium leading-6 text-gray-900">
-              Budget Performance
+              Исполнение бюджета
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Budget Utilization</span>
+                  <span className="text-gray-600">Освоение бюджета</span>
                   <span className="font-semibold">
                     {stats.budget_utilization.toFixed(1)}%
                   </span>
@@ -254,13 +237,13 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-sm text-gray-600">Allocated</p>
+                  <p className="text-sm text-gray-600">Выделено</p>
                   <p className="text-lg font-semibold">
                     ₸{(stats.total_budget / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Spent</p>
+                  <p className="text-sm text-gray-600">Освоено</p>
                   <p className="text-lg font-semibold">
                     ₸{(stats.total_spent / 1000000).toFixed(2)}M
                   </p>
@@ -273,14 +256,14 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         <Card>
           <CardHeader>
             <h3 className="text-lg font-medium leading-6 text-gray-900">
-              Team Progress
+              Прогресс команды
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Task Completion</span>
+                  <span className="text-gray-600">Выполнение задач</span>
                   <span className="font-semibold">
                     {stats.task_completion_rate.toFixed(1)}%
                   </span>
@@ -296,17 +279,17 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
               <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-sm text-gray-600">Всего</p>
                   <p className="text-lg font-semibold">{stats.total_tasks}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Done</p>
+                  <p className="text-sm text-gray-600">Завершено</p>
                   <p className="text-lg font-semibold text-green-600">
                     {stats.completed_tasks}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Overdue</p>
+                  <p className="text-sm text-gray-600">Просрочено</p>
                   <p className="text-lg font-semibold text-red-600">
                     {stats.overdue_tasks}
                   </p>

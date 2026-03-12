@@ -65,4 +65,25 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": settings.APP_NAME}
+    import os
+    from sqlalchemy import text
+    from app.database import SessionLocal
+
+    db_status = "ok"
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+    except Exception as e:
+        db_status = f"error: {str(e)[:80]}"
+
+    return {
+        "status": "healthy" if db_status == "ok" else "degraded",
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "checks": {"api": "ok", "database": db_status},
+        "llm_providers": {
+            "gemini": bool(os.environ.get("GEMINI_API_KEY")),
+            "groq": bool(os.environ.get("GROQ_API_KEY")),
+        },
+    }

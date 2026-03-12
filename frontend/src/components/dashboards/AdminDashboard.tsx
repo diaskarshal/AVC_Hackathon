@@ -14,43 +14,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      {/* AVC GROUP company banner */}
-      <div className="rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 px-6 py-5 text-white shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white">
-                <span className="text-primary-700 font-black text-sm">AVC</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold leading-none">AVC GROUP</h1>
-                <p className="text-primary-200 text-xs font-medium tracking-widest uppercase mt-0.5">BuildFlow — система управления ремонтами</p>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-2xl font-black">1 000+</p>
-              <p className="text-primary-200 text-xs leading-tight">сотрудников<br />в штате</p>
-            </div>
-            <div className="border-l border-primary-400 pl-4">
-              <p className="text-2xl font-black">150+</p>
-              <p className="text-primary-200 text-xs leading-tight">квалиф.<br />ИТР</p>
-            </div>
-            <div className="border-l border-primary-400 pl-4">
-              <p className="text-2xl font-black">47+</p>
-              <p className="text-primary-200 text-xs leading-tight">установок<br />АНПЗ · ПНХЗ</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Admin Dashboard
+          Дашборд администратора
         </h1>
         <p className="text-gray-600 mt-1">
-          Complete overview of all projects and resources
+          Полный обзор всех проектов и ресурсов
         </p>
       </div>
 
@@ -78,7 +47,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Projects
+                    Всего проектов
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.total_projects}
@@ -87,8 +56,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              {stats.active_projects} active,{" "}
-              {stats.completed_projects} completed
+              {stats.active_projects} активных,{" "}
+              {stats.completed_projects} завершённых
             </div>
           </CardBody>
         </Card>
@@ -115,7 +84,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Budget
+                    Общий бюджет
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     ₸{(stats.total_budget / 1000000).toFixed(1)}M
@@ -124,7 +93,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              ₸{(stats.total_spent / 1000000).toFixed(1)}M spent (
+              ₸{(stats.total_spent / 1000000).toFixed(1)}M освоено (
               {stats.budget_utilization.toFixed(1)}%)
             </div>
           </CardBody>
@@ -152,7 +121,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Tasks
+                    Всего задач
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.total_tasks}
@@ -161,7 +130,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              {stats.completed_tasks} completed (
+              {stats.completed_tasks} завершено (
               {stats.task_completion_rate.toFixed(1)}%)
             </div>
           </CardBody>
@@ -189,7 +158,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Overdue Tasks
+                    Просроченные задачи
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
                     {stats.overdue_tasks}
@@ -198,7 +167,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              Requires attention
+              Требуют внимания
             </div>
           </CardBody>
         </Card>
@@ -212,14 +181,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <Card>
           <CardHeader>
             <h3 className="text-lg font-medium leading-6 text-gray-900">
-              Budget Overview
+              Обзор бюджета
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Budget Utilization</span>
+                  <span className="text-gray-600">Освоение бюджета</span>
                   <span className="font-semibold">
                     {stats.budget_utilization.toFixed(1)}%
                   </span>
@@ -241,13 +210,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-sm text-gray-600">Total Budget</p>
+                  <p className="text-sm text-gray-600">Общий бюджет</p>
                   <p className="text-lg font-semibold">
                     ₸{(stats.total_budget / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Total Spent</p>
+                  <p className="text-sm text-gray-600">Всего освоено</p>
                   <p className="text-lg font-semibold">
                     ₸{(stats.total_spent / 1000000).toFixed(2)}M
                   </p>
@@ -260,14 +229,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <Card>
           <CardHeader>
             <h3 className="text-lg font-medium leading-6 text-gray-900">
-              Task Completion
+              Выполнение задач
             </h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Completion Rate</span>
+                  <span className="text-gray-600">Процент выполнения</span>
                   <span className="font-semibold">
                     {stats.task_completion_rate.toFixed(1)}%
                   </span>
@@ -283,17 +252,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                 <div>
-                  <p className="text-sm text-gray-600">Total</p>
+                  <p className="text-sm text-gray-600">Всего</p>
                   <p className="text-lg font-semibold">{stats.total_tasks}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Completed</p>
+                  <p className="text-sm text-gray-600">Завершено</p>
                   <p className="text-lg font-semibold text-green-600">
                     {stats.completed_tasks}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Overdue</p>
+                  <p className="text-sm text-gray-600">Просрочено</p>
                   <p className="text-lg font-semibold text-red-600">
                     {stats.overdue_tasks}
                   </p>

@@ -41,7 +41,7 @@ const Resources: React.FC = () => {
       setResources(response.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch resources");
+      setError(err.message || "Ошибка загрузки");
     } finally {
       setLoading(false);
     }
@@ -82,17 +82,17 @@ const Resources: React.FC = () => {
     resetForm();
     fetchResources();
   } catch (err: any) {
-    alert(err.message || "Failed to save resource");
+    alert(err.message || "Ошибка сохранения");
   }
 };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this resource?")) {
+    if (window.confirm("Удалить этот ресурс?")) {
       try {
         await resourcesAPI.delete(id);
         fetchResources();
       } catch (err: any) {
-        alert(err.message || "Failed to delete resource");
+        alert(err.message || "Ошибка удаления");
       }
     }
   };
@@ -197,7 +197,7 @@ const Resources: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading resources...</div>
+        <div className="text-gray-500">Загрузка...</div>
       </div>
     );
   }
@@ -205,7 +205,7 @@ const Resources: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
+        Ошибка: {error}
       </div>
     );
   }
@@ -373,24 +373,24 @@ const Resources: React.FC = () => {
           setIsModalOpen(false);
           resetForm();
         }}
-        title={editingResource ? "Edit Resource" : "Add New Resource"}
+        title={editingResource ? "Редактировать ресурс" : "Добавить ресурс"}
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label="Project"
+            label="Проект"
             name="project_id"
             value={formData.project_id}
             onChange={handleInputChange}
             options={[
-              { value: "", label: "Select a project" },
+              { value: "", label: "Выберите проект" },
               ...projects.map((p) => ({ value: p.id.toString(), label: p.name })),
             ]}
             required
           />
 
           <Input
-            label="Resource Name"
+            label="Название ресурса"
             name="name"
             value={formData.name}
             onChange={handleInputChange}
@@ -399,28 +399,28 @@ const Resources: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <Select
-              label="Type"
+              label="Тип"
               name="resource_type"
               value={formData.resource_type}
               onChange={handleInputChange}
               options={[
-                { value: "material", label: "Material" },
-                { value: "equipment", label: "Equipment" },
-                { value: "labor", label: "Labor" },
+                { value: "material", label: "Материал" },
+                { value: "equipment", label: "Оборудование" },
+                { value: "labor", label: "Персонал" },
               ]}
               required
             />
 
             <Select
-              label="Status"
+              label="Статус"
               name="status"
               value={formData.status}
               onChange={handleInputChange}
               options={[
-                { value: "available", label: "Available" },
-                { value: "in_use", label: "In Use" },
-                { value: "depleted", label: "Depleted" },
-                { value: "maintenance", label: "Maintenance" },
+                { value: "available", label: "Доступен" },
+                { value: "in_use", label: "В использовании" },
+                { value: "depleted", label: "Израсходован" },
+                { value: "maintenance", label: "На обслуживании" },
               ]}
               required
             />
@@ -428,7 +428,7 @@ const Resources: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Quantity"
+              label="Количество"
               type="number"
               name="quantity"
               value={formData.quantity}
@@ -437,16 +437,16 @@ const Resources: React.FC = () => {
             />
 
             <Input
-              label="Unit"
+              label="Ед. измерения"
               name="unit"
               value={formData.unit}
               onChange={handleInputChange}
-              placeholder="kg, m³, hours, etc."
+              placeholder="кг, м³, часы и т.д."
             />
           </div>
 
           <Input
-            label="Unit Cost"
+            label="Цена за единицу"
             type="number"
             name="unit_cost"
             value={formData.unit_cost}
@@ -456,16 +456,16 @@ const Resources: React.FC = () => {
           />
 
           <Input
-            label="Supplier"
+            label="Поставщик"
             name="supplier"
             value={formData.supplier}
             onChange={handleInputChange}
-            placeholder="Supplier name"
+            placeholder="Название поставщика"
           />
 
           <div className="bg-gray-50 px-4 py-3 rounded">
             <div className="text-sm text-gray-600">
-              Total Cost:{" "}
+              Итоговая стоимость:{" "}
               <span className="font-semibold text-gray-900">
                 {formatCurrency(Number(formData.quantity) * Number(formData.unit_cost))}
               </span>
@@ -481,10 +481,10 @@ const Resources: React.FC = () => {
                 resetForm();
               }}
             >
-              Cancel
+              Отмена
             </Button>
             <Button type="submit">
-              {editingResource ? "Update Resource" : "Add Resource"}
+              {editingResource ? "Сохранить" : "Добавить"}
             </Button>
           </div>
         </form>

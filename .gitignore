@@ -10,7 +10,4 @@ frontend/package-lock.json
 dist/
 build/
 
-txts/
-
-/bundle.py
-/codebase_bundle.md
+.claude/

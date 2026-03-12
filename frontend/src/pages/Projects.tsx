@@ -17,6 +17,9 @@ const Projects: React.FC = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [customerFilter, setCustomerFilter] = useState<string>("");
+  const [cityFilter, setCityFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -211,6 +214,21 @@ const Projects: React.FC = () => {
     );
   }
 
+  // Unique values for filter pills
+  const customers = Array.from(new Set(projects.map((p) => p.customer).filter(Boolean))) as string[];
+  const cities = Array.from(new Set(projects.map((p) => p.location).filter(Boolean))) as string[];
+  const statuses = [
+    { value: "planning", label: "Планирование" },
+    { value: "in_progress", label: "В работе" },
+    { value: "on_hold", label: "На паузе" },
+    { value: "completed", label: "Завершён" },
+    { value: "cancelled", label: "Отменён" },
+  ];
+  const visibleProjects = projects
+    .filter((p) => !customerFilter || p.customer === customerFilter)
+    .filter((p) => !cityFilter || p.location === cityFilter)
+    .filter((p) => !statusFilter || p.status === statusFilter);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -225,8 +243,96 @@ const Projects: React.FC = () => {
         </div>
       </div>
 
+      {/* Filter bars */}
+      {(customers.length > 0 || cities.length > 0) && (
+        <div className="space-y-2">
+          {customers.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-gray-500 font-medium w-20">Заказчик:</span>
+              <button
+                onClick={() => setCustomerFilter("")}
+                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  customerFilter === ""
+                    ? "bg-primary-600 text-white border-primary-600"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-primary-400"
+                }`}
+              >
+                Все
+              </button>
+              {customers.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCustomerFilter(c === customerFilter ? "" : c)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    customerFilter === c
+                      ? "bg-primary-600 text-white border-primary-600"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-primary-400"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
+          {cities.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-gray-500 font-medium w-20">Город:</span>
+              <button
+                onClick={() => setCityFilter("")}
+                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  cityFilter === ""
+                    ? "bg-primary-600 text-white border-primary-600"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-primary-400"
+                }`}
+              >
+                Все
+              </button>
+              {cities.map((city) => (
+                <button
+                  key={city}
+                  onClick={() => setCityFilter(city === cityFilter ? "" : city)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    cityFilter === city
+                      ? "bg-primary-600 text-white border-primary-600"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-primary-400"
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-500 font-medium w-20">Статус:</span>
+            <button
+              onClick={() => setStatusFilter("")}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                statusFilter === ""
+                  ? "bg-primary-600 text-white border-primary-600"
+                  : "bg-white text-gray-600 border-gray-300 hover:border-primary-400"
+              }`}
+            >
+              Все
+            </button>
+            {statuses.map((s) => (
+              <button
+                key={s.value}
+                onClick={() => setStatusFilter(s.value === statusFilter ? "" : s.value)}
+                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  statusFilter === s.value
+                    ? "bg-primary-600 text-white border-primary-600"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-primary-400"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
+        {visibleProjects.map((project) => (
           <Card key={project.id} className="cursor-pointer hover:shadow-lg transition-shadow">
             <CardBody className="space-y-4">
               <div onClick={() => openDetailModal(project)}>
@@ -238,12 +344,17 @@ const Projects: React.FC = () => {
                 </p>
               </div>
 
-              <div>
+              <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(project.status)}`}
                 >
                   {getStatusLabel(project.status)}
                 </span>
+                {project.customer && (
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
+                    {project.customer}
+                  </span>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -288,7 +399,7 @@ const Projects: React.FC = () => {
         ))}
       </div>
 
-      {projects.length === 0 && (
+      {visibleProjects.length === 0 && (
         <Card>
           <CardBody className="text-center py-12">
             <p className="text-gray-500">No projects found</p>

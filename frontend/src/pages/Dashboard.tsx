@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
       setStats(response.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch dashboard data");
+      setError(err.message || "Ошибка загрузки дашборда");
     } finally {
       setLoading(false);
     }
@@ -33,7 +33,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading dashboard...</div>
+        <div className="text-gray-500">Загрузка дашборда...</div>
       </div>
     );
   }
@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
+        Ошибка: {error}
       </div>
     );
   }

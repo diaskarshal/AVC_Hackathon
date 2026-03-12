@@ -43,7 +43,7 @@ const Tasks: React.FC = () => {
       setTasks(response.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch tasks");
+      setError(err.message || "Ошибка загрузки");
     } finally {
       setLoading(false);
     }
@@ -97,18 +97,18 @@ const Tasks: React.FC = () => {
     } catch (err: any) {
       const errorMsg = err.response?.data?.detail 
         ? JSON.stringify(err.response.data.detail)
-        : err.message || "Failed to save task";
+        : err.message || "Ошибка сохранения";
       alert(errorMsg);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
+    if (window.confirm("Удалить эту задачу?")) {
       try {
         await tasksAPI.delete(id);
         fetchTasks();
       } catch (err: any) {
-        alert(err.message || "Failed to delete task");
+        alert(err.message || "Ошибка удаления");
       }
     }
   };
@@ -222,7 +222,7 @@ const Tasks: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading tasks...</div>
+        <div className="text-gray-500">Загрузка задач...</div>
       </div>
     );
   }
@@ -230,7 +230,7 @@ const Tasks: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
+        Ошибка: {error}
       </div>
     );
   }
@@ -415,7 +415,7 @@ const Tasks: React.FC = () => {
           </TableBody>
         </Table>
         {filteredTasks.length === 0 && (
-          <div className="text-center py-12 text-gray-500">No tasks found</div>
+          <div className="text-center py-12 text-gray-500">Задачи не найдены</div>
         )}
       </Card>
 
@@ -426,24 +426,24 @@ const Tasks: React.FC = () => {
           setIsModalOpen(false);
           resetForm();
         }}
-        title={editingTask ? "Edit Task" : "Create New Task"}
+        title={editingTask ? "Редактировать задачу" : "Создать задачу"}
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label="Project"
+            label="Проект"
             name="project_id"
             value={formData.project_id}
             onChange={handleInputChange}
             options={[
-              { value: "", label: "Select a project" },
+              { value: "", label: "Выберите проект" },
               ...projects.map((p) => ({ value: p.id.toString(), label: p.name })),
             ]}
             required
           />
 
           <Input
-            label="Task Name"
+            label="Название задачи"
             name="name"
             value={formData.name}
             onChange={handleInputChange}
@@ -451,7 +451,7 @@ const Tasks: React.FC = () => {
           />
 
           <TextArea
-            label="Description"
+            label="Описание"
             name="description"
             value={formData.description}
             onChange={handleInputChange}
@@ -460,30 +460,30 @@ const Tasks: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <Select
-              label="Status"
+              label="Статус"
               name="status"
               value={formData.status}
               onChange={handleInputChange}
               options={[
-                { value: "not_started", label: "Not Started" },
-                { value: "in_progress", label: "In Progress" },
-                { value: "completed", label: "Completed" },
-                { value: "delayed", label: "Delayed" },
-                { value: "blocked", label: "Blocked" },
+                { value: "not_started", label: "Не начато" },
+                { value: "in_progress", label: "В работе" },
+                { value: "completed", label: "Завершено" },
+                { value: "delayed", label: "Задержка" },
+                { value: "blocked", label: "Заблокировано" },
               ]}
               required
             />
 
             <Select
-              label="Priority"
+              label="Приоритет"
               name="priority"
               value={formData.priority}
               onChange={handleInputChange}
               options={[
-                { value: "low", label: "Low" },
-                { value: "medium", label: "Medium" },
-                { value: "high", label: "High" },
-                { value: "critical", label: "Critical" },
+                { value: "low", label: "Низкий" },
+                { value: "medium", label: "Средний" },
+                { value: "high", label: "Высокий" },
+                { value: "critical", label: "Критический" },
               ]}
               required
             />
@@ -491,7 +491,7 @@ const Tasks: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Start Date"
+              label="Дата начала"
               type="date"
               name="start_date"
               value={formData.start_date}
@@ -499,7 +499,7 @@ const Tasks: React.FC = () => {
             />
 
             <Input
-              label="Planned End Date"
+              label="Плановая дата окончания"
               type="date"
               name="planned_end_date"
               value={formData.planned_end_date}
@@ -508,7 +508,7 @@ const Tasks: React.FC = () => {
           </div>
 
           <Input
-            label="Progress (%)"
+            label="Прогресс (%)"
             type="number"
             name="progress_percentage"
             value={formData.progress_percentage}
@@ -517,11 +517,11 @@ const Tasks: React.FC = () => {
           />
 
           <Input
-            label="Assigned To"
+            label="Исполнитель"
             name="assigned_to"
             value={formData.assigned_to}
             onChange={handleInputChange}
-            placeholder="Team member name"
+            placeholder="Имя сотрудника"
           />
 
           <div className="flex justify-end space-x-3 pt-4">
@@ -533,10 +533,10 @@ const Tasks: React.FC = () => {
                 resetForm();
               }}
             >
-              Cancel
+              Отмена
             </Button>
             <Button type="submit">
-              {editingTask ? "Update Task" : "Create Task"}
+              {editingTask ? "Сохранить" : "Создать"}
             </Button>
           </div>
         </form>

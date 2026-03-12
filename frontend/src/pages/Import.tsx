@@ -19,7 +19,7 @@ const Import: React.FC = () => {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setError("Please select a file first");
+      setError("Пожалуйста, выберите файл");
       return;
     }
 
@@ -38,7 +38,7 @@ const Import: React.FC = () => {
         response = await importAPI.uploadCSV(selectedFile);
       } else {
         throw new Error(
-          "Invalid file type. Please upload .xlsx, .xls, or .csv files"
+          "Неверный тип файла. Загрузите файл .xlsx, .xls или .csv"
         );
       }
 
@@ -52,7 +52,7 @@ const Import: React.FC = () => {
       setError(
         err.response?.data?.detail ||
           err.message ||
-          "Failed to upload file"
+          "Ошибка загрузки файла"
       );
     } finally {
       setUploading(false);
@@ -62,20 +62,18 @@ const Import: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Import Data</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Импорт данных</h1>
       </div>
 
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Upload Excel or CSV File
+            Загрузить файл Excel или CSV
           </h3>
         </CardHeader>
         <CardBody className="space-y-4">
           <p className="text-sm text-gray-600">
-            Import projects(always first), tasks, resources, and budget data from Excel or
-            CSV files. The file should contain sheets/columns matching the
-            required format.
+            Импортируйте проекты (всегда первыми), задачи, ресурсы и данные бюджета из файлов Excel или CSV. Файл должен содержать листы/столбцы в требуемом формате.
           </p>
 
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
@@ -98,7 +96,7 @@ const Import: React.FC = () => {
                   htmlFor="file-upload"
                   className="cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
                 >
-                  <span>Upload a file</span>
+                  <span>Выбрать файл</span>
                   <input
                     id="file-upload"
                     name="file-upload"
@@ -109,11 +107,11 @@ const Import: React.FC = () => {
                   />
                 </label>
                 <p className="pl-1 text-sm text-gray-600">
-                  or drag and drop
+                  или перетащите файл
                 </p>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                XLSX, XLS, or CSV up to 10MB
+                XLSX, XLS или CSV до 10 МБ
               </p>
             </div>
           </div>
@@ -150,7 +148,7 @@ const Import: React.FC = () => {
                   if (fileInput) fileInput.value = "";
                 }}
               >
-                Remove
+                Удалить
               </Button>
             </div>
           )}
@@ -160,7 +158,7 @@ const Import: React.FC = () => {
               onClick={handleUpload}
               disabled={!selectedFile || uploading}
             >
-              {uploading ? "Uploading..." : "Upload and Import"}
+              {uploading ? "Загрузка..." : "Загрузить и импортировать"}
             </Button>
           </div>
 
@@ -172,19 +170,19 @@ const Import: React.FC = () => {
 
           {result && (
             <div className="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded">
-              <h4 className="font-semibold mb-2">Import Successful!</h4>
+              <h4 className="font-semibold mb-2">Импорт выполнен успешно!</h4>
               <div className="text-sm space-y-1">
                 {result.stats?.projects !== undefined && (
-                  <p>Projects imported: {result.stats.projects}</p>
+                  <p>Проектов импортировано: {result.stats.projects}</p>
                 )}
                 {result.stats?.tasks !== undefined && (
-                  <p>Tasks imported: {result.stats.tasks}</p>
+                  <p>Задач импортировано: {result.stats.tasks}</p>
                 )}
                 {result.stats?.resources !== undefined && (
-                  <p>Resources imported: {result.stats.resources}</p>
+                  <p>Ресурсов импортировано: {result.stats.resources}</p>
                 )}
                 {result.stats?.budgets !== undefined && (
-                  <p>Budgets imported: {result.stats.budgets}</p>
+                  <p>Записей бюджета импортировано: {result.stats.budgets}</p>
                 )}
               </div>
             </div>
@@ -195,17 +193,17 @@ const Import: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Import Format Guide
+            Руководство по формату импорта
           </h3>
         </CardHeader>
         <CardBody>
           <div className="space-y-4">
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">
-                Excel Format (Multi-sheet)
+                Формат Excel (несколько листов)
               </h4>
               <p className="text-sm text-gray-600 mb-2">
-                Create separate sheets for each data type:
+                Создайте отдельные листы для каждого типа данных:
               </p>
               <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
               <li>
@@ -230,12 +228,10 @@ const Import: React.FC = () => {
 
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">
-                CSV Format (Single entity type)
+                Формат CSV (один тип данных)
               </h4>
               <p className="text-sm text-gray-600">
-                CSV files should contain columns matching one of the formats
-                above. The system will auto-detect the entity type based on
-                the columns.
+                CSV-файл должен содержать столбцы, соответствующие одному из форматов выше. Система автоматически определит тип данных по названиям столбцов.
               </p>
             </div>
           </div>

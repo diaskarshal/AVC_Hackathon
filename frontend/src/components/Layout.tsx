@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     if (user.role === "admin") {
       return [
-        { path: "/admin/dashboard", label: "Dashboard" },
+        { path: "/admin/dashboard", label: "Дашборд" },
         { path: "/projects", label: "Проекты" },
         { path: "/tasks", label: "Задачи" },
         { path: "/resources", label: "Ресурсы" },
@@ -35,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ];
     } else if (user.role === "manager") {
       return [
-        { path: "/manager/dashboard", label: "Dashboard" },
+        { path: "/manager/dashboard", label: "Дашборд" },
         { path: "/projects", label: "Проекты" },
         { path: "/tasks", label: "Задачи" },
         { path: "/resources", label: "Ресурсы" },
@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ];
     } else {
       return [
-        { path: "/worker/dashboard", label: "Dashboard" },
+        { path: "/worker/dashboard", label: "Дашборд" },
         { path: "/worker/my-tasks", label: "Мои задачи" },
       ];
     }

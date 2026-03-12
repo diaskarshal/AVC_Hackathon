@@ -62,6 +62,7 @@ interface AnalysisResult {
   specialists_count: number;
   equipment_count: number;
   total_manhours: number;
+  warnings?: string[];
 }
 
 type Step = "upload" | "analyzing" | "results" | "accepted";
@@ -155,11 +156,17 @@ const TenderAnalyzer: React.FC = () => {
   // Hot deals
   const [hotDeals, setHotDeals] = useState<any[]>([]);
   const [hotDealsLoading, setHotDealsLoading] = useState(true);
-
   const fetchHotDeals = () => {
     setHotDealsLoading(true);
     tenderAPI.getHotDeals()
-      .then((res) => setHotDeals(res.data))
+      .then((res) => {
+        const data = res.data;
+        if (data.deals) {
+          setHotDeals(data.deals);
+        } else {
+          setHotDeals(Array.isArray(data) ? data : []);
+        }
+      })
       .catch(() => {})
       .finally(() => setHotDealsLoading(false));
   };
@@ -269,7 +276,7 @@ const TenderAnalyzer: React.FC = () => {
     new Intl.NumberFormat("ru-RU").format(Math.round(cost)) + " KZT";
 
   const calcTotal = (items: ResourceItem[]) =>
-    items.reduce((sum, r) => sum + r.quantity * r.unit_cost, 0);
+    items.reduce((sum, r) => sum + (r.total_cost || r.quantity * r.unit_cost), 0);
 
   const resetToUpload = () => {
     setStep("upload");
@@ -610,6 +617,23 @@ const TenderAnalyzer: React.FC = () => {
       {/* ── Step 3: Results (editable tables) ───────────────────────────── */}
       {step === "results" && analysis && (
         <>
+          {/* LLM warnings */}
+          {analysis.warnings && analysis.warnings.length > 0 && (
+            <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-2">
+                <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-amber-800">Предупреждение</p>
+                  {analysis.warnings.map((w, i) => (
+                    <p key={i} className="text-sm text-amber-700 mt-1">{w}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Summary cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Parsed Scope — shows raw lot data from the tender table */}
@@ -629,6 +653,14 @@ const TenderAnalyzer: React.FC = () => {
                   }
                   return (
                     <div className="space-y-4">
+                      {analysis.parsed_scope?.customer && (
+                        <div>
+                          <span className="text-xs font-medium text-gray-500 uppercase">Заказчик</span>
+                          <p className="text-sm font-semibold text-indigo-700 mt-0.5">
+                            {analysis.parsed_scope.customer}
+                          </p>
+                        </div>
+                      )}
                       {lots.map((lot, i) => (
                         <div key={i} className="space-y-2">
                           {lots.length > 1 && (

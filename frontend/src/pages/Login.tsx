@@ -34,7 +34,7 @@ const Login: React.FC = () => {
     try {
       await login({ username, password });
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Ошибка входа. Попробуйте ещё раз.");
     } finally {
       setLoading(false);
     }
@@ -61,6 +61,15 @@ const Login: React.FC = () => {
     }
   };
 
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "admin": return "Администратор";
+      case "manager": return "Менеджер";
+      case "worker": return "Сотрудник";
+      default: return role;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-8">
@@ -71,27 +80,27 @@ const Login: React.FC = () => {
               BuildFlow ERP
             </h1>
             <p className="text-gray-600">
-              Construction Project Management System
+              Система управления ремонтными проектами
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="Username"
+              label="Логин"
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
+              placeholder="Введите логин"
               required
             />
 
             <Input
-              label="Password"
+              label="Пароль"
               type="password"
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
+              placeholder="Введите пароль"
               required
             />
 
@@ -106,22 +115,49 @@ const Login: React.FC = () => {
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Вход..." : "Войти"}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Demo accounts available →</p>
+            <p>Доступны демо-аккаунты →</p>
+          </div>
+
+          {/* AVC GROUP banner */}
+          <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-700 shrink-0">
+                <span className="text-white font-black text-sm">AVC</span>
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 text-base leading-tight">AVC GROUP</p>
+                <p className="text-gray-500 text-xs tracking-widest uppercase">BuildFlow — система управления ремонтами</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-center pt-3 border-t border-gray-200">
+              <div>
+                <p className="text-xl font-black text-gray-900">1 000+</p>
+                <p className="text-gray-500 text-xs leading-tight">сотрудников<br />в штате</p>
+              </div>
+              <div className="border-l border-gray-200">
+                <p className="text-xl font-black text-gray-900">150+</p>
+                <p className="text-gray-500 text-xs leading-tight">квалиф.<br />ИТР</p>
+              </div>
+              <div className="border-l border-gray-200">
+                <p className="text-xl font-black text-gray-900">47+</p>
+                <p className="text-gray-500 text-xs leading-tight">установок<br />АНПЗ · ПНХЗ</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Demo Users Panel */}
         <div className="bg-white rounded-lg shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Demo Accounts
+            Демо-аккаунты
           </h2>
           <p className="text-gray-600 mb-6">
-            Click any account to quick-fill the login form
+            Нажмите на аккаунт для автозаполнения
           </p>
 
           <div className="space-y-3">
@@ -138,11 +174,11 @@ const Login: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {user.role}
+                    {getRoleLabel(user.role)}
                   </span>
                 </div>
                 <div className="text-sm text-gray-600">
-                  <div>Username: {user.username}</div>
+                  <div>Логин: {user.username}</div>
                   <div className="text-xs text-gray-500 mt-1">
                     {user.hint}
                   </div>
@@ -153,17 +189,17 @@ const Login: React.FC = () => {
 
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-blue-900 mb-2">
-              Role Descriptions:
+              Описание ролей:
             </h3>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>
-                <strong>Admin:</strong> Full system access
+                <strong>Администратор:</strong> Полный доступ к системе
               </li>
               <li>
-                <strong>Manager:</strong> Manage assigned projects
+                <strong>Менеджер:</strong> Управление назначенными проектами
               </li>
               <li>
-                <strong>Worker:</strong> View and update own tasks
+                <strong>Сотрудник:</strong> Просмотр и обновление своих задач
               </li>
             </ul>
           </div>

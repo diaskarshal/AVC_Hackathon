@@ -12,6 +12,7 @@ class ProjectBase(BaseModel):
     planned_end_date: Optional[datetime] = None
     total_budget: float = Field(default=0.0, ge=0)
     location: Optional[str] = None
+    customer: Optional[str] = None
 
 
 class ProjectCreate(ProjectBase):
@@ -28,6 +29,7 @@ class ProjectUpdate(BaseModel):
     total_budget: Optional[float] = Field(None, ge=0)
     spent_amount: Optional[float] = Field(None, ge=0)
     location: Optional[str] = None
+    customer: Optional[str] = None
 
 
 class ProjectResponse(ProjectBase):

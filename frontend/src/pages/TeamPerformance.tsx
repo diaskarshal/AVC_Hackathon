@@ -39,7 +39,7 @@ const TeamPerformancePage: React.FC = () => {
       setPerformance(response.data.performance);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch team performance");
+      setError(err.message || "Ошибка загрузки показателей команды");
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ const TeamPerformancePage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading team performance...</div>
+        <div className="text-gray-500">Загрузка...</div>
       </div>
     );
   }
@@ -77,7 +77,7 @@ const TeamPerformancePage: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
+        Ошибка: {error}
       </div>
     );
   }
@@ -349,7 +349,7 @@ const TeamPerformancePage: React.FC = () => {
                 {performance.filter((p) => p.completion_rate < 60).length ===
                   0 && (
                   <div className="text-center text-sm text-gray-500">
-                    All team members performing well! 🎉
+                    Все сотрудники справляются отлично! 🎉
                   </div>
                 )}
               </div>

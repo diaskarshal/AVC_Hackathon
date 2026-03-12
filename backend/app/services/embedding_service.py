@@ -2,13 +2,16 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List
 
-# Load once at startup — model is ~80MB, cached in Docker layer
+# Multilingual model — critical for Russian-language tender/project data.
+# all-MiniLM-L6-v2 was English-only and produced poor similarity scores
+# for Cyrillic text. This model supports 50+ languages including Russian.
 _model = None
+_MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
 
 def get_model() -> SentenceTransformer:
     global _model
     if _model is None:
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
+        _model = SentenceTransformer(_MODEL_NAME)
     return _model
 
 def embed_text(text: str) -> List[float]:

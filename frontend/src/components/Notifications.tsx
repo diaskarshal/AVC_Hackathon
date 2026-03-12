@@ -77,13 +77,13 @@ const Notifications: React.FC = () => {
           <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-20 max-h-96 overflow-y-auto">
             <div className="px-4 py-2 border-b border-gray-200">
               <div className="text-sm font-semibold text-gray-900">
-                Notifications
+                Уведомления
               </div>
             </div>
 
             {loading ? (
               <div className="px-4 py-8 text-center text-gray-500">
-                Loading...
+                Загрузка...
               </div>
             ) : overdueTasks.length > 0 ? (
               <div className="divide-y divide-gray-200">
@@ -108,16 +108,16 @@ const Notifications: React.FC = () => {
                           {task.name}
                         </p>
                         <p className="text-xs text-red-600 mt-1">
-                          Overdue since{" "}
+                          Просрочено с{" "}
                           {task.planned_end_date
                             ? new Date(
                                 task.planned_end_date
                               ).toLocaleDateString()
-                            : "N/A"}
+                            : "—"}
                         </p>
                         {task.assigned_to && (
                           <p className="text-xs text-gray-500 mt-1">
-                            Assigned to: {task.assigned_to}
+                            Исполнитель: {task.assigned_to}
                           </p>
                         )}
                       </div>
@@ -126,7 +126,7 @@ const Notifications: React.FC = () => {
                 ))}
                 {overdueTasks.length > 5 && (
                   <div className="px-4 py-2 text-center text-sm text-primary-600 hover:bg-gray-50">
-                    +{overdueTasks.length - 5} more overdue tasks
+                    +{overdueTasks.length - 5} просроченных задач
                   </div>
                 )}
               </div>
@@ -145,7 +145,7 @@ const Notifications: React.FC = () => {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="mt-2 text-sm">No overdue tasks!</p>
+                <p className="mt-2 text-sm">Просроченных задач нет!</p>
               </div>
             )}
           </div>

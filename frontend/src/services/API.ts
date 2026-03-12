@@ -48,6 +48,7 @@ export interface Project {
   budget_utilization: number;
   remaining_budget: number;
   location?: string;
+  customer?: string;
   created_at: string;
   updated_at: string;
 }
@@ -257,6 +258,7 @@ export const authAPI = {
     api.get("/api/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     }),
+  refresh: () => api.post("/api/auth/refresh"),
   getDemoUsers: () => api.get("/api/auth/demo-users"),
 };
 

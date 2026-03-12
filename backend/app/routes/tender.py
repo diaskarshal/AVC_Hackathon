@@ -9,7 +9,7 @@ from app.models.project import Project, ProjectStatus
 from app.models.task import Task, TaskPriority, TaskStatus
 from app.models.resource import Resource, ResourceType, ResourceStatus
 from app.models.budget import Budget
-from app.services.tender_parser import TenderParserService
+from app.services.tender_parser import TenderParserService, shorten_company, extract_city
 from app.services.llm_service import LLMService
 from app.services.similarity_service import SimilarityService
 from app.services.embedding_service import embed_text
@@ -67,6 +67,16 @@ async def analyze_tender(
 
     # Extract structured scope
     parsed_scope = await llm.extract_tender_scope(tender.raw_text or "")
+
+    # Normalize location → city only; customer → known abbreviation
+    if parsed_scope.get("location"):
+        parsed_scope["location"] = extract_city(parsed_scope["location"])
+    if parsed_scope.get("customer"):
+        parsed_scope["customer"] = shorten_company(parsed_scope["customer"])
+    for lot in parsed_scope.get("lots", []):
+        if lot.get("location"):
+            lot["location"] = extract_city(lot["location"])
+
     tender.parsed_scope = parsed_scope
     tender.status = TenderStatus.PARSED
     # Update tender title with the parsed project name
@@ -90,6 +100,23 @@ async def analyze_tender(
     # Calculate total cost from resources
     total_cost = sum(r.get("total_cost", 0) for r in plan_data.get("resources", []))
 
+    # Composite confidence score (not just similarity — that's misleading)
+    # Components:
+    #   1. Similarity quality (40%) — best match cosine score
+    #   2. Budget alignment (30%) — how close LLM estimate is to tender budget
+    #   3. Plan completeness (30%) — did the LLM return enough resources + tasks
+    sim_score = similar[0]["similarity_score"] if similar else 0.0
+    tender_budget = parsed_scope.get("estimated_budget_kzt", 0)
+    llm_total = plan_data.get("estimated_total_cost", 0) or total_cost
+    if tender_budget > 0 and llm_total > 0:
+        budget_ratio = min(llm_total, tender_budget) / max(llm_total, tender_budget)
+    else:
+        budget_ratio = 0.3  # no budget data = low confidence
+    n_resources = len(plan_data.get("resources", []))
+    n_tasks = len(plan_data.get("tasks", []))
+    completeness = min(1.0, (n_resources / 6) * 0.5 + (n_tasks / 4) * 0.5)
+    confidence = round(sim_score * 0.4 + budget_ratio * 0.3 + completeness * 0.3, 3)
+
     # Store the FULL plan (resources + tasks + reasoning) in plan_data
     resource_plan = TenderResourcePlan(
         tender_id=tender.id,
@@ -97,13 +124,20 @@ async def analyze_tender(
         estimated_total_cost=total_cost or plan_data.get("estimated_total_cost", 0),
         estimated_duration_days=plan_data.get("estimated_duration_days", 90),
         similar_project_ids=[sp["project"].id for sp in similar],
-        confidence_score=similar[0]["similarity_score"] if similar else 0.0,
+        confidence_score=confidence,
         llm_reasoning=plan_data.get("reasoning", "")
     )
     db.add(resource_plan)
     tender.status = TenderStatus.PLAN_GENERATED
     db.commit()
     db.refresh(resource_plan)
+
+    # Collect any LLM errors for frontend display
+    warnings = []
+    if parsed_scope.get("_llm_error"):
+        warnings.append(f"Извлечение данных: {parsed_scope['_llm_error']}")
+    if plan_data.get("_llm_error"):
+        warnings.append(f"Ресурсный план: {plan_data['_llm_error']}")
 
     return {
         "tender_id": tender.id,
@@ -122,6 +156,7 @@ async def analyze_tender(
         "specialists_count": plan_data.get("specialists_count", 0),
         "equipment_count": plan_data.get("equipment_count", 0),
         "total_manhours": plan_data.get("total_manhours", 0),
+        "warnings": warnings if warnings else None,
     }
 
 
@@ -152,7 +187,8 @@ async def accept_tender_plan(
         start_date=datetime.utcnow(),
         planned_end_date=datetime.utcnow() + timedelta(days=plan.estimated_duration_days or 90),
         total_budget=plan.estimated_total_cost,
-        location=scope.get("location", "")
+        location=scope.get("location", ""),
+        customer=scope.get("customer", "") or None,
     )
     db.add(project)
     db.flush()
@@ -272,9 +308,9 @@ async def get_hot_deals():
         pass
 
     if live_deals:
-        return live_deals
+        return {"deals": live_deals, "is_demo": False}
 
-    # Fallback: realistic mock tenders — large pool, 5 random on each call
+    # Fallback: demo tenders (Goszakup API unavailable — requires auth token)
     import random
     from datetime import date, timedelta
     today = date.today()
@@ -402,7 +438,7 @@ async def get_hot_deals():
         },
     ]
 
-    return random.sample(pool, min(5, len(pool)))
+    return {"deals": random.sample(pool, min(5, len(pool))), "is_demo": True}
 
 
 @router.get("/", dependencies=[Depends(get_current_user)])

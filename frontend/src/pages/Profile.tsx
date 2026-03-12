@@ -41,13 +41,13 @@ const Profile: React.FC = () => {
       await usersAPI.updateProfile(formData);
       setMessage({
         type: "success",
-        text: "Profile updated successfully! Please log in again to see changes.",
+        text: "Профиль успешно обновлён! Войдите снова, чтобы увидеть изменения.",
       });
       setIsEditing(false);
     } catch (err: any) {
       setMessage({
         type: "error",
-        text: err.message || "Failed to update profile",
+        text: err.message || "Ошибка обновления профиля",
       });
     } finally {
       setLoading(false);
@@ -120,7 +120,7 @@ const Profile: React.FC = () => {
           {isEditing ? (
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
-                label="Name"
+                label="Имя"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}

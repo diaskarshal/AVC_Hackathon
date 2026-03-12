@@ -31,17 +31,21 @@ async def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
 async def get_projects(
     skip: int = 0,
     limit: int = 100,
+    customer: str = None,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
     service = ProjectService(db)
-    
+    projects = service.get_projects(skip=skip, limit=limit)
+
     if current_user["role"] == "manager":
         managed_project_ids = current_user.get("managed_projects", [])
-        projects = service.get_projects(skip=skip, limit=limit)
-        return [p for p in projects if p.id in managed_project_ids]
-    
-    return service.get_projects(skip=skip, limit=limit)
+        projects = [p for p in projects if p.id in managed_project_ids]
+
+    if customer:
+        projects = [p for p in projects if p.customer == customer]
+
+    return projects
 
 
 @router.get("/summary", response_model=List[ProjectSummary])
