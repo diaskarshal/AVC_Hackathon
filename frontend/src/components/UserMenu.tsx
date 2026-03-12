@@ -29,11 +29,6 @@ const UserMenu: React.FC = () => {
       >
         <div className="text-right">
           <div className="text-sm font-medium text-white">{user.name}</div>
-          <div
-            className={`text-xs px-2 py-0.5 rounded-full inline-block ${getRoleBadgeColor(user.role)}`}
-          >
-            {user.role}
-          </div>
         </div>
         <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary-600 font-bold">
           {user.name.charAt(0)}

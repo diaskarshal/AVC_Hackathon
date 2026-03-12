@@ -115,7 +115,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              ${(stats.total_spent / 1000000).toFixed(1)}M spent
+              ₸{(stats.total_spent / 1000000).toFixed(1)}M spent
             </div>
           </CardBody>
         </Card>
@@ -256,13 +256,13 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 <div>
                   <p className="text-sm text-gray-600">Allocated</p>
                   <p className="text-lg font-semibold">
-                    ${(stats.total_budget / 1000000).toFixed(2)}M
+                    ₸{(stats.total_budget / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Spent</p>
                   <p className="text-lg font-semibold">
-                    ${(stats.total_spent / 1000000).toFixed(2)}M
+                    ₸{(stats.total_spent / 1000000).toFixed(2)}M
                   </p>
                 </div>
               </div>

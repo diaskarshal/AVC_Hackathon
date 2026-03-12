@@ -790,57 +790,13 @@ const TenderAnalyzer: React.FC = () => {
                     </svg>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">Методология расчёта</h3>
-                  <span className="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full font-medium">ИИ объяснение</span>
                 </div>
               </CardHeader>
               <CardBody>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Reasoning text */}
-                  <div className="lg:col-span-2">
-                    <div className="bg-indigo-50 border-l-4 border-indigo-400 rounded-r-lg p-4">
-                      <p className="text-xs font-semibold text-indigo-500 uppercase mb-2">Логика ИИ</p>
-                      <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
-                        {analysis.reasoning}
-                      </p>
-                    </div>
-                  </div>
-                  {/* Key derivation story */}
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Как получен план</p>
-                    <div className="space-y-2">
-                      {analysis.similar_projects.length > 0 && (
-                        <div className="flex items-start gap-2 bg-blue-50 rounded-lg p-3">
-                          <span className="text-blue-500 text-lg leading-none mt-0.5">①</span>
-                          <div>
-                            <p className="text-xs font-medium text-blue-800">Найден аналог</p>
-                            <p className="text-xs text-blue-600 mt-0.5">
-                              «{analysis.similar_projects[0].name}»<br />
-                              совпадение {(analysis.similar_projects[0].score * 100).toFixed(0)}%
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex items-start gap-2 bg-purple-50 rounded-lg p-3">
-                        <span className="text-purple-500 text-lg leading-none mt-0.5">②</span>
-                        <div>
-                          <p className="text-xs font-medium text-purple-800">Масштабирование</p>
-                          <p className="text-xs text-purple-600 mt-0.5">
-                            Ресурсы скорректированы под объём и специфику нового тендера
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2 bg-green-50 rounded-lg p-3">
-                        <span className="text-green-500 text-lg leading-none mt-0.5">③</span>
-                        <div>
-                          <p className="text-xs font-medium text-green-800">Итоговый план</p>
-                          <p className="text-xs text-green-600 mt-0.5">
-                            {editResources.length} ресурсов · {editTasks.length} задач<br />
-                            {formatCost(calcTotal(editResources))}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="bg-indigo-50 border-l-4 border-indigo-400 rounded-r-lg p-4">
+                  <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+                    {analysis.reasoning}
+                  </p>
                 </div>
               </CardBody>
             </Card>
@@ -851,8 +807,7 @@ const TenderAnalyzer: React.FC = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium text-gray-900">
-                  Resource Plan{" "}
-                  <span className="text-sm font-normal text-gray-500">(editable)</span>
+                  Resource Plan
                 </h3>
                 <span className="text-sm text-gray-500">
                   Total:{" "}
@@ -971,8 +926,7 @@ const TenderAnalyzer: React.FC = () => {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-medium text-gray-900">
-                Task Plan{" "}
-                <span className="text-sm font-normal text-gray-500">(editable)</span>
+                Task Plan
               </h3>
             </CardHeader>
             <CardBody>
@@ -1078,13 +1032,7 @@ const TenderAnalyzer: React.FC = () => {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100">
-                    <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
                   <h3 className="text-lg font-medium text-gray-900">Календарный план</h3>
-                  <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">Gantt</span>
                   <span className="ml-auto text-sm text-gray-500">
                     Итого:{" "}
                     <span className="font-bold text-gray-900">
@@ -1105,21 +1053,21 @@ const TenderAnalyzer: React.FC = () => {
           {/* ── Accept Section ───────────────────────────────────────────── */}
           <Card>
             <CardBody>
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex items-end gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Project Name
+                  <label className="block text-lg font-semibold text-gray-900 mb-2">
+                    Название проекта
                   </label>
                   <input
                     type="text"
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="Enter project name..."
+                    placeholder="Введите название проекта..."
                   />
                 </div>
-                <Button size="lg" variant="success" onClick={handleAccept}>
-                  Accept & Create Project
+                <Button variant="success" onClick={handleAccept}>
+                  Принять
                 </Button>
               </div>
             </CardBody>

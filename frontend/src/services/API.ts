@@ -221,6 +221,8 @@ export const analyticsAPI = {
       `/api/analytics/team-performance${projectId ? `?project_id=${projectId}` : ""}`
     ),
   getCharts: () => api.get("/api/analytics/charts"),
+  getBudgetTrend: () => api.get("/api/analytics/budget-trend"),
+  getWorkforceUtilization: () => api.get("/api/analytics/workforce-utilization"),
 };
 
 export const tenderAPI = {

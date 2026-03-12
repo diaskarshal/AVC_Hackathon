@@ -176,6 +176,27 @@ const Tasks: React.FC = () => {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      not_started: "Не начато",
+      in_progress: "В работе",
+      completed: "Завершено",
+      delayed: "Задержка",
+      blocked: "Заблокировано",
+    };
+    return labels[status] || status.replace("_", " ");
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    const labels: Record<string, string> = {
+      low: "Низкий",
+      medium: "Средний",
+      high: "Высокий",
+      critical: "Критический",
+    };
+    return labels[priority] || priority;
+  };
+
   const getPriorityColor = (priority: string) => {
     const colors: Record<string, string> = {
       low: "text-gray-600",
@@ -217,12 +238,12 @@ const Tasks: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Задачи</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            Export
+            Экспорт
           </Button>
-          <Button onClick={() => setIsModalOpen(true)}>Add New Task</Button>
+          <Button onClick={() => setIsModalOpen(true)}>Добавить задачу</Button>
         </div>
       </div>
 
@@ -230,28 +251,28 @@ const Tasks: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Tasks</div>
+            <div className="text-sm text-gray-500">Всего задач</div>
             <div className="text-2xl font-bold text-gray-900">{totalTasks}</div>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Completed</div>
+            <div className="text-sm text-gray-500">Завершено</div>
             <div className="text-2xl font-bold text-green-600">{completedTasks}</div>
             <div className="text-xs text-gray-500 mt-1">
-              {completionRate.toFixed(1)}% completion rate
+              {completionRate.toFixed(1)}% выполнения
             </div>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">In Progress</div>
+            <div className="text-sm text-gray-500">В работе</div>
             <div className="text-2xl font-bold text-blue-600">{inProgressTasks}</div>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Overdue</div>
+            <div className="text-sm text-gray-500">Просрочено</div>
             <div className="text-2xl font-bold text-red-600">{overdueTasks}</div>
           </CardBody>
         </Card>
@@ -262,27 +283,27 @@ const Tasks: React.FC = () => {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Select
-              label="Filter by Project"
+              label="По проекту"
               name="filterProject"
               value={filterProject}
               onChange={(e) => setFilterProject(e.target.value)}
               options={[
-                { value: "", label: "All Projects" },
+                { value: "", label: "Все проекты" },
                 ...projects.map((p) => ({ value: p.id.toString(), label: p.name })),
               ]}
             />
             <Select
-              label="Filter by Status"
+              label="По статусу"
               name="filterStatus"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               options={[
-                { value: "", label: "All Statuses" },
-                { value: "not_started", label: "Not Started" },
-                { value: "in_progress", label: "In Progress" },
-                { value: "completed", label: "Completed" },
-                { value: "delayed", label: "Delayed" },
-                { value: "blocked", label: "Blocked" },
+                { value: "", label: "Все статусы" },
+                { value: "not_started", label: "Не начато" },
+                { value: "in_progress", label: "В работе" },
+                { value: "completed", label: "Завершено" },
+                { value: "delayed", label: "Задержка" },
+                { value: "blocked", label: "Заблокировано" },
               ]}
             />
             <div className="flex items-end">
@@ -294,7 +315,7 @@ const Tasks: React.FC = () => {
                 }}
                 className="w-full"
               >
-                Clear Filters
+                Сбросить
               </Button>
             </div>
           </div>
@@ -305,14 +326,14 @@ const Tasks: React.FC = () => {
       <Card>
         <Table>
           <TableHeader>
-            <TableHead>Task Name</TableHead>
-            <TableHead>Project</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Priority</TableHead>
-            <TableHead>Progress</TableHead>
-            <TableHead>Assigned To</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Задача</TableHead>
+            <TableHead>Проект</TableHead>
+            <TableHead>Статус</TableHead>
+            <TableHead>Приоритет</TableHead>
+            <TableHead>Прогресс</TableHead>
+            <TableHead>Исполнитель</TableHead>
+            <TableHead>Срок</TableHead>
+            <TableHead>Действия</TableHead>
           </TableHeader>
           <TableBody>
             {filteredTasks.map((task) => (
@@ -337,12 +358,12 @@ const Tasks: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(task.status)}`}
                   >
-                    {task.status.replace("_", " ")}
+                    {getStatusLabel(task.status)}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className={`font-semibold capitalize ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
+                  <span className={`font-semibold ${getPriorityColor(task.priority)}`}>
+                    {getPriorityLabel(task.priority)}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -357,7 +378,7 @@ const Tasks: React.FC = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {task.assigned_to || <span className="text-gray-400">Unassigned</span>}
+                  {task.assigned_to || <span className="text-gray-400">Не назначен</span>}
                 </TableCell>
                 <TableCell>
                   {task.planned_end_date ? (
@@ -366,11 +387,11 @@ const Tasks: React.FC = () => {
                         {new Date(task.planned_end_date).toLocaleDateString()}
                       </div>
                       {task.is_overdue && (
-                        <span className="text-xs text-red-600 font-semibold">Overdue</span>
+                        <span className="text-xs text-red-600 font-semibold">Просрочено</span>
                       )}
                     </div>
                   ) : (
-                    <span className="text-gray-400">No date</span>
+                    <span className="text-gray-400">Не указан</span>
                   )}
                 </TableCell>
                 <TableCell>
@@ -379,13 +400,13 @@ const Tasks: React.FC = () => {
                       onClick={() => openEditModal(task)}
                       className="text-primary-600 hover:text-primary-900"
                     >
-                      Edit
+                      Изменить
                     </button>
                     <button
                       onClick={() => handleDelete(task.id)}
                       className="text-red-600 hover:text-red-900"
                     >
-                      Delete
+                      Удалить
                     </button>
                   </div>
                 </TableCell>

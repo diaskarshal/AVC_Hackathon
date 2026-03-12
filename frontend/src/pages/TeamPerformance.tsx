@@ -60,10 +60,10 @@ const TeamPerformancePage: React.FC = () => {
   };
 
   const getPerformanceBadge = (rate: number) => {
-    if (rate >= 80) return { label: "Excellent", color: "bg-green-100 text-green-800" };
-    if (rate >= 60) return { label: "Good", color: "bg-yellow-100 text-yellow-800" };
-    if (rate >= 40) return { label: "Fair", color: "bg-orange-100 text-orange-800" };
-    return { label: "Needs Improvement", color: "bg-red-100 text-red-800" };
+    if (rate >= 80) return { label: "Отлично", color: "bg-green-100 text-green-800" };
+    if (rate >= 60) return { label: "Хорошо", color: "bg-yellow-100 text-yellow-800" };
+    if (rate >= 40) return { label: "Удовл.", color: "bg-orange-100 text-orange-800" };
+    return { label: "Нужна помощь", color: "bg-red-100 text-red-800" };
   };
 
   if (loading) {
@@ -98,17 +98,17 @@ const TeamPerformancePage: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Team Performance
+            Показатели команды
           </h1>
           <p className="text-gray-600 mt-1">
-            Track team member productivity and task completion
+            Продуктивность и выполнение задач по сотрудникам
           </p>
         </div>
         <button
           onClick={fetchPerformance}
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
         >
-          Refresh
+          Обновить
         </button>
       </div>
 
@@ -116,12 +116,12 @@ const TeamPerformancePage: React.FC = () => {
       <Card>
         <CardBody>
           <Select
-            label="Filter by Project"
+            label="По проекту"
             name="selectedProject"
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
             options={[
-              { value: "", label: "All Projects" },
+              { value: "", label: "Все проекты" },
               ...projects.map((p) => ({
                 value: p.id.toString(),
                 label: p.name,
@@ -135,7 +135,7 @@ const TeamPerformancePage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Team Members</div>
+            <div className="text-sm text-gray-500">Сотрудники</div>
             <div className="text-2xl font-bold text-gray-900">
               {performance.length}
             </div>
@@ -143,13 +143,13 @@ const TeamPerformancePage: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Tasks</div>
+            <div className="text-sm text-gray-500">Всего задач</div>
             <div className="text-2xl font-bold text-gray-900">{totalTasks}</div>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Completed</div>
+            <div className="text-sm text-gray-500">Завершено</div>
             <div className="text-2xl font-bold text-green-600">
               {totalCompleted}
             </div>
@@ -157,7 +157,7 @@ const TeamPerformancePage: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Avg. Completion Rate</div>
+            <div className="text-sm text-gray-500">Ср. выполнение</div>
             <div className={`text-2xl font-bold ${getPerformanceColor(avgCompletion)}`}>
               {avgCompletion.toFixed(1)}%
             </div>
@@ -169,12 +169,12 @@ const TeamPerformancePage: React.FC = () => {
       <Card>
         <Table>
           <TableHeader>
-            <TableHead>Worker</TableHead>
-            <TableHead>Total Tasks</TableHead>
-            <TableHead>Completed</TableHead>
-            <TableHead>Avg. Progress</TableHead>
-            <TableHead>Completion Rate</TableHead>
-            <TableHead>Performance</TableHead>
+            <TableHead>Сотрудник</TableHead>
+            <TableHead>Задач</TableHead>
+            <TableHead>Завершено</TableHead>
+            <TableHead>Ср. прогресс</TableHead>
+            <TableHead>Выполнение</TableHead>
+            <TableHead>Оценка</TableHead>
           </TableHeader>
           <TableBody>
             {performance.length > 0 ? (
@@ -248,7 +248,7 @@ const TeamPerformancePage: React.FC = () => {
               <tr>
                 <TableCell colSpan={6}>
                   <div className="text-center py-8 text-gray-500">
-                    No performance data available
+                    Нет данных о показателях
                   </div>
                 </TableCell>
               </tr>
@@ -263,7 +263,7 @@ const TeamPerformancePage: React.FC = () => {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
-                Top Performers
+                Лучшие сотрудники
               </h3>
             </CardHeader>
             <CardBody>
@@ -296,7 +296,7 @@ const TeamPerformancePage: React.FC = () => {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
-                Most Active
+                Наиболее активные
               </h3>
             </CardHeader>
             <CardBody>
@@ -313,7 +313,7 @@ const TeamPerformancePage: React.FC = () => {
                         {member.worker_name}
                       </span>
                       <span className="text-sm font-semibold text-blue-600">
-                        {member.total_tasks} tasks
+                        {member.total_tasks} задач
                       </span>
                     </div>
                   ))}
@@ -324,7 +324,7 @@ const TeamPerformancePage: React.FC = () => {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-medium leading-6 text-gray-900">
-                Needs Support
+                Требуют внимания
               </h3>
             </CardHeader>
             <CardBody>

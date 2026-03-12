@@ -153,10 +153,19 @@ const Projects: React.FC = () => {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      planning: "Планирование",
+      in_progress: "В работе",
+      on_hold: "На паузе",
+      completed: "Завершён",
+      cancelled: "Отменён",
+    };
+    return labels[status] || status.replace("_", " ");
+  };
+
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return "₸" + new Intl.NumberFormat("ru-RU", {
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -205,13 +214,13 @@ const Projects: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Проекты</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            Export
+            Экспорт
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>
-            Add New Project
+            Добавить проект
           </Button>
         </div>
       </div>
@@ -233,19 +242,19 @@ const Projects: React.FC = () => {
                 <span
                   className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(project.status)}`}
                 >
-                  {project.status.replace("_", " ")}
+                  {getStatusLabel(project.status)}
                 </span>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Budget:</span>
+                  <span className="text-gray-500">Бюджет:</span>
                   <span className="font-medium text-gray-900">
                     {formatCurrency(project.total_budget)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Spent:</span>
+                  <span className="text-gray-500">Освоено:</span>
                   <span className="font-medium text-gray-900">
                     {formatCurrency(project.spent_amount)}
                   </span>

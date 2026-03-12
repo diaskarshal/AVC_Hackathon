@@ -118,13 +118,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     Total Budget
                   </dt>
                   <dd className="text-2xl font-semibold text-gray-900">
-                    ${(stats.total_budget / 1000000).toFixed(1)}M
+                    ₸{(stats.total_budget / 1000000).toFixed(1)}M
                   </dd>
                 </dl>
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              ${(stats.total_spent / 1000000).toFixed(1)}M spent (
+              ₸{(stats.total_spent / 1000000).toFixed(1)}M spent (
               {stats.budget_utilization.toFixed(1)}%)
             </div>
           </CardBody>
@@ -243,13 +243,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div>
                   <p className="text-sm text-gray-600">Total Budget</p>
                   <p className="text-lg font-semibold">
-                    ${(stats.total_budget / 1000000).toFixed(2)}M
+                    ₸{(stats.total_budget / 1000000).toFixed(2)}M
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total Spent</p>
                   <p className="text-lg font-semibold">
-                    ${(stats.total_spent / 1000000).toFixed(2)}M
+                    ₸{(stats.total_spent / 1000000).toFixed(2)}M
                   </p>
                 </div>
               </div>

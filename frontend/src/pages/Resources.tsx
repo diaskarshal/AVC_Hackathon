@@ -154,6 +154,25 @@ const Resources: React.FC = () => {
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      available: "Доступен",
+      in_use: "В использовании",
+      depleted: "Израсходован",
+      maintenance: "На обслуживании",
+    };
+    return labels[status] || status.replace("_", " ");
+  };
+
+  const getTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      material: "Материал",
+      equipment: "Оборудование",
+      labor: "Персонал",
+    };
+    return labels[type] || type;
+  };
+
   const getTypeIcon = (type: string) => {
     const icons: Record<string, string> = {
       material: "🧱",
@@ -164,10 +183,7 @@ const Resources: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+    return "₸" + new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 0 }).format(amount);
   };
 
   const filteredResources = resources.filter((resource) => {
@@ -197,13 +213,13 @@ const Resources: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Resources</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Ресурсы</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            Export
+            Экспорт
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>
-            Add New Resource
+            Добавить ресурс
           </Button>
         </div>
       </div>
@@ -212,19 +228,19 @@ const Resources: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Resources</div>
+            <div className="text-sm text-gray-500">Всего ресурсов</div>
             <div className="text-2xl font-bold text-gray-900">{filteredResources.length}</div>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Cost</div>
+            <div className="text-sm text-gray-500">Общая стоимость</div>
             <div className="text-2xl font-bold text-gray-900">{formatCurrency(totalCost)}</div>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Available Resources</div>
+            <div className="text-sm text-gray-500">Доступных</div>
             <div className="text-2xl font-bold text-gray-900">
               {filteredResources.filter((r) => r.status === "available").length}
             </div>
@@ -237,25 +253,25 @@ const Resources: React.FC = () => {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Select
-              label="Filter by Project"
+              label="По проекту"
               name="filterProject"
               value={filterProject}
               onChange={(e) => setFilterProject(e.target.value)}
               options={[
-                { value: "", label: "All Projects" },
+                { value: "", label: "Все проекты" },
                 ...projects.map((p) => ({ value: p.id.toString(), label: p.name })),
               ]}
             />
             <Select
-              label="Filter by Type"
+              label="По типу"
               name="filterType"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               options={[
-                { value: "", label: "All Types" },
-                { value: "material", label: "Material" },
-                { value: "equipment", label: "Equipment" },
-                { value: "labor", label: "Labor" },
+                { value: "", label: "Все типы" },
+                { value: "material", label: "Материал" },
+                { value: "equipment", label: "Оборудование" },
+                { value: "labor", label: "Персонал" },
               ]}
             />
             <div className="flex items-end">
@@ -267,7 +283,7 @@ const Resources: React.FC = () => {
                 }}
                 className="w-full"
               >
-                Clear Filters
+                Сбросить
               </Button>
             </div>
           </div>
@@ -278,15 +294,15 @@ const Resources: React.FC = () => {
       <Card>
         <Table>
           <TableHeader>
-            <TableHead>Resource</TableHead>
-            <TableHead>Project</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Unit Cost</TableHead>
-            <TableHead>Total Cost</TableHead>
-            <TableHead>Supplier</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Ресурс</TableHead>
+            <TableHead>Проект</TableHead>
+            <TableHead>Тип</TableHead>
+            <TableHead>Статус</TableHead>
+            <TableHead>Количество</TableHead>
+            <TableHead>Цена за ед.</TableHead>
+            <TableHead>Итого</TableHead>
+            <TableHead>Поставщик</TableHead>
+            <TableHead>Действия</TableHead>
           </TableHeader>
           <TableBody>
             {filteredResources.map((resource) => (
@@ -306,13 +322,13 @@ const Resources: React.FC = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="capitalize">{resource.resource_type}</span>
+                  <span>{getTypeLabel(resource.resource_type)}</span>
                 </TableCell>
                 <TableCell>
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(resource.status)}`}
                   >
-                    {resource.status.replace("_", " ")}
+                    {getStatusLabel(resource.status)}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -323,7 +339,7 @@ const Resources: React.FC = () => {
                   <span className="font-semibold">{formatCurrency(resource.total_cost)}</span>
                 </TableCell>
                 <TableCell>
-                  {resource.supplier || <span className="text-gray-400">N/A</span>}
+                  {resource.supplier || <span className="text-gray-400">—</span>}
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
@@ -331,13 +347,13 @@ const Resources: React.FC = () => {
                       onClick={() => openEditModal(resource)}
                       className="text-primary-600 hover:text-primary-900"
                     >
-                      Edit
+                      Изменить
                     </button>
                     <button
                       onClick={() => handleDelete(resource.id)}
                       className="text-red-600 hover:text-red-900"
                     >
-                      Delete
+                      Удалить
                     </button>
                   </div>
                 </TableCell>
@@ -346,7 +362,7 @@ const Resources: React.FC = () => {
           </TableBody>
         </Table>
         {filteredResources.length === 0 && (
-          <div className="text-center py-12 text-gray-500">No resources found</div>
+          <div className="text-center py-12 text-gray-500">Ресурсы не найдены</div>
         )}
       </Card>
 

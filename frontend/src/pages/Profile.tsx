@@ -72,8 +72,8 @@ const Profile: React.FC = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-600 mt-1">Manage your account information</p>
+        <h1 className="text-3xl font-bold text-gray-900">Мой профиль</h1>
+        <p className="text-gray-600 mt-1">Управление учётной записью</p>
       </div>
 
       {message && (
@@ -93,11 +93,11 @@ const Profile: React.FC = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium leading-6 text-gray-900">
-              Profile Information
+              Информация профиля
             </h3>
             {!isEditing && (
               <Button onClick={() => setIsEditing(true)} size="sm">
-                Edit Profile
+                Редактировать
               </Button>
             )}
           </div>
@@ -147,10 +147,10 @@ const Profile: React.FC = () => {
                     });
                   }}
                 >
-                  Cancel
+                  Отмена
                 </Button>
                 <Button type="submit" disabled={loading}>
-                  {loading ? "Saving..." : "Save Changes"}
+                  {loading ? "Сохранение..." : "Сохранить"}
                 </Button>
               </div>
             </form>
@@ -158,7 +158,7 @@ const Profile: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Username
+                  Имя пользователя
                 </label>
                 <p className="mt-1 text-gray-900">{user.username}</p>
               </div>
@@ -170,14 +170,14 @@ const Profile: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Role
+                  Роль
                 </label>
                 <p className="mt-1 text-gray-900 capitalize">{user.role}</p>
               </div>
               {user.worker_name && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Worker Name
+                    Имя сотрудника
                   </label>
                   <p className="mt-1 text-gray-900">{user.worker_name}</p>
                 </div>
@@ -185,10 +185,10 @@ const Profile: React.FC = () => {
               {user.managed_projects && user.managed_projects.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Managed Projects
+                    Курируемые проекты
                   </label>
                   <p className="mt-1 text-gray-900">
-                    {user.managed_projects.length} project(s)
+                    {user.managed_projects.length} проект(ов)
                   </p>
                 </div>
               )}

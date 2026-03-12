@@ -144,10 +144,7 @@ const Budgets: React.FC = () => {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+    return "₸" + new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 0 }).format(amount);
   };
 
   const getVarianceColor = (variance: number) => {
@@ -193,13 +190,13 @@ const Budgets: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Budgets</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Бюджет</h1>
         <div className="flex space-x-3">
           <Button variant="secondary" onClick={handleExport}>
-            Export
+            Экспорт
           </Button>
           <Button onClick={() => setIsModalOpen(true)}>
-            Add Budget Entry
+            Добавить запись
           </Button>
         </div>
       </div>
@@ -208,7 +205,7 @@ const Budgets: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Planned</div>
+            <div className="text-sm text-gray-500">Плановая сумма</div>
             <div className="text-2xl font-bold text-gray-900">
               {formatCurrency(totalPlanned)}
             </div>
@@ -216,7 +213,7 @@ const Budgets: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Total Actual</div>
+            <div className="text-sm text-gray-500">Фактическая сумма</div>
             <div className="text-2xl font-bold text-gray-900">
               {formatCurrency(totalActual)}
             </div>
@@ -224,7 +221,7 @@ const Budgets: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Variance</div>
+            <div className="text-sm text-gray-500">Отклонение</div>
             <div
               className={`text-2xl font-bold ${getVarianceColor(totalVariance)}`}
             >
@@ -234,7 +231,7 @@ const Budgets: React.FC = () => {
         </Card>
         <Card>
           <CardBody>
-            <div className="text-sm text-gray-500">Variance %</div>
+            <div className="text-sm text-gray-500">Отклонение %</div>
             <div
               className={`text-2xl font-bold ${getVarianceColor(totalVariance)}`}
             >
@@ -249,12 +246,12 @@ const Budgets: React.FC = () => {
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
-              label="Filter by Project"
+              label="По проекту"
               name="filterProject"
               value={filterProject}
               onChange={(e) => setFilterProject(e.target.value)}
               options={[
-                { value: "", label: "All Projects" },
+                { value: "", label: "Все проекты" },
                 ...projects.map((p) => ({
                   value: p.id.toString(),
                   label: p.name,
@@ -267,7 +264,7 @@ const Budgets: React.FC = () => {
                 onClick={() => setFilterProject("")}
                 className="w-full"
               >
-                Clear Filter
+                Сбросить
               </Button>
             </div>
           </div>
@@ -278,14 +275,14 @@ const Budgets: React.FC = () => {
       <Card>
         <Table>
           <TableHeader>
-            <TableHead>Category</TableHead>
-            <TableHead>Project</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Planned Amount</TableHead>
-            <TableHead>Actual Amount</TableHead>
-            <TableHead>Variance</TableHead>
-            <TableHead>Variance %</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Категория</TableHead>
+            <TableHead>Проект</TableHead>
+            <TableHead>Описание</TableHead>
+            <TableHead>Плановая сумма</TableHead>
+            <TableHead>Факт. сумма</TableHead>
+            <TableHead>Отклонение</TableHead>
+            <TableHead>Откл. %</TableHead>
+            <TableHead>Действия</TableHead>
           </TableHeader>
           <TableBody>
             {filteredBudgets.map((budget) => (
@@ -306,7 +303,7 @@ const Budgets: React.FC = () => {
                 <TableCell>
                   <div className="text-gray-600 max-w-xs truncate">
                     {budget.description || (
-                      <span className="text-gray-400">No description</span>
+                      <span className="text-gray-400">—</span>
                     )}
                   </div>
                 </TableCell>
@@ -340,13 +337,13 @@ const Budgets: React.FC = () => {
                       onClick={() => openEditModal(budget)}
                       className="text-primary-600 hover:text-primary-900"
                     >
-                      Edit
+                      Изменить
                     </button>
                     <button
                       onClick={() => handleDelete(budget.id)}
                       className="text-red-600 hover:text-red-900"
                     >
-                      Delete
+                      Удалить
                     </button>
                   </div>
                 </TableCell>

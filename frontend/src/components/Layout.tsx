@@ -24,29 +24,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (user.role === "admin") {
       return [
         { path: "/admin/dashboard", label: "Dashboard" },
-        { path: "/projects", label: "Projects" },
-        { path: "/tasks", label: "Tasks" },
-        { path: "/resources", label: "Resources" },
-        { path: "/budgets", label: "Budgets" },
-        { path: "/team-performance", label: "Team" },
-        { path: "/users", label: "Users" },
-        { path: "/import", label: "Import" },
-        { path: "/tender", label: "Tender" },
+        { path: "/projects", label: "Проекты" },
+        { path: "/tasks", label: "Задачи" },
+        { path: "/resources", label: "Ресурсы" },
+        { path: "/budgets", label: "Бюджет" },
+        { path: "/team-performance", label: "Команда" },
+        { path: "/users", label: "Пользователи" },
+        { path: "/import", label: "Импорт" },
+        { path: "/tender", label: "Тендер" },
       ];
     } else if (user.role === "manager") {
       return [
         { path: "/manager/dashboard", label: "Dashboard" },
-        { path: "/projects", label: "Projects" },
-        { path: "/tasks", label: "Tasks" },
-        { path: "/resources", label: "Resources" },
-        { path: "/budgets", label: "Budgets" },
-        { path: "/team-performance", label: "Team" },
-        { path: "/tender", label: "Tender" },
+        { path: "/projects", label: "Проекты" },
+        { path: "/tasks", label: "Задачи" },
+        { path: "/resources", label: "Ресурсы" },
+        { path: "/budgets", label: "Бюджет" },
+        { path: "/team-performance", label: "Команда" },
+        { path: "/tender", label: "Тендер" },
       ];
     } else {
       return [
         { path: "/worker/dashboard", label: "Dashboard" },
-        { path: "/worker/my-tasks", label: "My Tasks" },
+        { path: "/worker/my-tasks", label: "Мои задачи" },
       ];
     }
   };

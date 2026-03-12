@@ -216,6 +216,10 @@ async def accept_tender_plan(
     db.commit()
     db.refresh(project)
 
+    # Index the new project so future similarity searches can find it
+    similarity = SimilarityService(db)
+    similarity.index_project(project)
+
     return {
         "project_id": project.id,
         "message": f"Project '{project.name}' created successfully",

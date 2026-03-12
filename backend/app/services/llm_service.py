@@ -173,7 +173,10 @@ Respond with ONLY the JSON object. No markdown fences. No explanation."""
         deadline = parsed_scope.get("deadline_days", 90)
 
         ctx = company_context or AVC_COMPANY_CONTEXT
-        prompt = f"""You are a senior estimator at AVC Group — an EPC company specialising in oil refinery repairs in Kazakhstan.
+        labor_share = int(budget * 0.50)
+        material_share = int(budget * 0.30)
+        equipment_share = int(budget * 0.20)
+        prompt = f"""You are a senior cost estimator at AVC Group — an EPC company specialising in oil refinery repairs in Kazakhstan.
 
 COMPANY PROFILE (AVC GROUP):
 {ctx}
@@ -185,10 +188,23 @@ TENDER SCOPE:
 - Location: {parsed_scope.get('location', '')}
 - Volume: {parsed_scope.get('volume_description', '')}
 - Deadline: {deadline} calendar days
-- Tender budget: {budget:,.0f} KZT
+- Tender budget (ПЛАНИРУЕМАЯ СУММА БЕЗ НДС): {budget:,.0f} KZT
 {lots_text}
 SIMILAR COMPLETED PROJECTS (use for calibration):
 {similar_text if similar_text else "No historical data — use industry norms for Kazakhstan 2024-2025."}
+
+⚠️ BUDGET CALIBRATION — THIS IS MANDATORY:
+The TOTAL of all resource costs MUST equal approximately {budget:,.0f} KZT (±10%).
+Budget breakdown guidance:
+  - Labor (труд): ~{labor_share:,.0f} KZT  (~50% of budget)
+  - Materials (материалы): ~{material_share:,.0f} KZT  (~30% of budget)
+  - Equipment (техника): ~{equipment_share:,.0f} KZT  (~20% of budget)
+
+Kazakhstan petroleum-industry daily rates:
+  - Сварщик, монтажник (skilled): 35 000–55 000 KZT/day
+  - ИТР, мастер: 45 000–70 000 KZT/day
+  - Подсобный рабочий: 20 000–30 000 KZT/day
+  - Machine-shift (маш/см): 80 000–250 000 KZT/shift
 
 Return ONLY valid JSON (no fences):
 {{
@@ -198,7 +214,7 @@ Return ONLY valid JSON (no fences):
       "name": "Name in Russian",
       "quantity": number,
       "unit": "чел/дн | шт | м | кг | маш/см | комплект",
-      "unit_cost": number (KZT),
+      "unit_cost": number (KZT — must reflect Kazakhstan petroleum industry rates above),
       "total_cost": number (KZT),
       "notes": "brief justification"
     }}
@@ -212,19 +228,18 @@ Return ONLY valid JSON (no fences):
       "assigned_role": "role in Russian"
     }}
   ],
-  "estimated_total_cost": number (KZT, should be close to tender budget {budget:,.0f}),
+  "estimated_total_cost": number (KZT — MUST be within 10% of {budget:,.0f}),
   "estimated_duration_days": {deadline},
-  "specialists_count": integer (REQUIRED: total number of workers = sum of all labor resource quantities),
-  "equipment_count": integer (REQUIRED: total machinery units = sum of all equipment resource quantities),
-  "total_manhours": integer (REQUIRED: specialists_count × {deadline} days × 8 hours/day),
-  "reasoning": "2 sentences in Russian"
+  "specialists_count": integer (sum of all labor resource quantities),
+  "equipment_count": integer (sum of all equipment resource quantities),
+  "total_manhours": integer (specialists_count × {deadline} × 8),
+  "reasoning": "Detailed reasoning in Russian (6-8 sentences). Cover: (1) which reference project was used as the primary analogue and why; (2) how the budget of {budget:,.0f} KZT was distributed across labor/materials/equipment; (3) justification for the chosen headcount citing AVC GROUP benchmarks; (4) why the timeline of {deadline} days is sufficient; (5) key technical risks or assumptions; (6) how unit costs were derived from Kazakhstan petroleum-industry norms."
 }}
 
 Rules:
 - 6-12 resources, 4-8 tasks
 - Scale workforce to this SINGLE OBJECT tender (not full plant turnaround)
-- Use the "ОРИЕНТИРЫ ДЛЯ РАСЧЁТА" benchmarks from company profile to set realistic headcount
-- For labor: unit=чел/дн, unit_cost = daily rate 10 000–25 000 KZT
+- sum of all resource total_cost values MUST approximately equal {budget:,.0f} KZT
 - specialists_count MUST equal the INTEGER sum of quantity for all labor resources
 - equipment_count MUST equal the INTEGER sum of quantity for all equipment resources
 - total_manhours = specialists_count × {deadline} × 8"""
@@ -257,6 +272,17 @@ Rules:
             result["specialists_count"] = specialists
             result["equipment_count"] = equipment
             result["total_manhours"] = manhours
+
+            # Budget normalization: if LLM total is off by >30% from tender budget, scale costs
+            if budget > 0 and resources:
+                llm_total = sum(r.get("total_cost", 0) for r in resources)
+                if llm_total > 0:
+                    ratio = budget / llm_total
+                    if ratio > 1.3 or ratio < 0.7:
+                        for r in resources:
+                            r["unit_cost"] = round(r.get("unit_cost", 0) * ratio)
+                            r["total_cost"] = round(r.get("total_cost", 0) * ratio)
+                        result["estimated_total_cost"] = budget
 
             return result
         except Exception:

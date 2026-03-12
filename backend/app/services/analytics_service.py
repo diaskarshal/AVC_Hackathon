@@ -321,6 +321,109 @@ class AnalyticsService:
             "budget_vs_spent": budget_per_project,
         }
 
+    def get_workforce_utilization(self) -> Dict:
+        """Company capacity vs deployed workers across active projects."""
+        TOTAL_CAPACITY = 1000  # AVC GROUP штатная численность
+
+        active_projects = self.db.query(Project).filter(
+            Project.status == ProjectStatus.IN_PROGRESS
+        ).all()
+
+        active_ids = [p.id for p in active_projects]
+
+        # Sum labour resources per project
+        project_workforce = []
+        total_deployed = 0
+        for p in active_projects:
+            labor_resources = self.db.query(Resource).filter(
+                Resource.project_id == p.id,
+                Resource.resource_type == ResourceType.LABOR,
+            ).all()
+            workers = int(sum(r.quantity for r in labor_resources))
+            total_deployed += workers
+            short_name = (p.name[:25] + "…") if len(p.name) > 25 else p.name
+            project_workforce.append({
+                "project": short_name,
+                "workers": workers,
+                "budget": round(p.total_budget / 1_000_000, 1),
+            })
+
+        # Sort descending by workers
+        project_workforce.sort(key=lambda x: x["workers"], reverse=True)
+
+        utilization_pct = round(total_deployed / TOTAL_CAPACITY * 100, 1) if TOTAL_CAPACITY > 0 else 0
+
+        return {
+            "total_capacity": TOTAL_CAPACITY,
+            "total_deployed": total_deployed,
+            "available": max(0, TOTAL_CAPACITY - total_deployed),
+            "utilization_pct": utilization_pct,
+            "active_projects_count": len(active_projects),
+            "by_project": project_workforce,
+        }
+
+    def get_budget_trend(self) -> Dict:
+        """Monthly cumulative planned budget vs actual spent, plus a forecast line."""
+        from collections import defaultdict
+        import calendar
+
+        projects = self.db.query(Project).all()
+
+        # Build monthly buckets: { "YYYY-MM": {"planned": X, "spent": Y} }
+        monthly: Dict[str, Dict[str, float]] = defaultdict(lambda: {"planned": 0.0, "spent": 0.0})
+
+        for p in projects:
+            if not p.start_date:
+                continue
+            # Attribute the entire planned budget to the project's start month
+            month_key = p.start_date.strftime("%Y-%m")
+            monthly[month_key]["planned"] += float(p.total_budget or 0)
+            monthly[month_key]["spent"] += float(p.spent_amount or 0)
+
+        if not monthly:
+            return {"months": [], "planned": [], "actual": [], "forecast": []}
+
+        # Sort months
+        sorted_months = sorted(monthly.keys())
+        months_out = []
+        cumulative_planned = []
+        cumulative_actual = []
+        cum_p = 0.0
+        cum_a = 0.0
+        for m in sorted_months:
+            cum_p += monthly[m]["planned"]
+            cum_a += monthly[m]["spent"]
+            months_out.append(m)
+            cumulative_planned.append(round(cum_p / 1_000_000, 2))
+            cumulative_actual.append(round(cum_a / 1_000_000, 2))
+
+        # Simple forecast: linear extension from the last actual point
+        # Slope = average monthly spend across all months
+        n = len(months_out)
+        slope = (cumulative_actual[-1] / n) if n > 0 else 0
+
+        # Project 3 more months forward
+        forecast_months = []
+        forecast_values = []
+        last_m = sorted_months[-1]
+        year, month = int(last_m[:4]), int(last_m[5:])
+        last_val = cumulative_actual[-1]
+        for i in range(1, 4):
+            month += 1
+            if month > 12:
+                month = 1
+                year += 1
+            forecast_months.append(f"{year:04d}-{month:02d}")
+            forecast_values.append(round(last_val + slope * i, 2))
+
+        return {
+            "months": months_out,
+            "planned": cumulative_planned,
+            "actual": cumulative_actual,
+            "forecast_months": forecast_months,
+            "forecast": forecast_values,
+        }
+
     def get_team_performance(self, project_id: int = None) -> Dict:
         from sqlalchemy import case
         

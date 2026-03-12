@@ -44,18 +44,6 @@ const Users: React.FC = () => {
     }
   };
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "👑";
-      case "manager":
-        return "📊";
-      case "worker":
-        return "👷";
-      default:
-        return "👤";
-    }
-  };
 
   if (loading) {
     return (
@@ -163,7 +151,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {getRoleIcon(user.role)} {user.role}
+                    {user.role}
                   </span>
                 </TableCell>
               </tr>
@@ -176,7 +164,7 @@ const Users: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            📊 Project Managers
+            Project Managers
           </h3>
         </CardHeader>
         <Table>
@@ -217,7 +205,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {getRoleIcon(user.role)} {user.role}
+                    {user.role}
                   </span>
                 </TableCell>
               </tr>
@@ -230,7 +218,7 @@ const Users: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 className="text-lg font-medium leading-6 text-gray-900">
-            👷 Workers
+            Workers
           </h3>
         </CardHeader>
         <Table>
@@ -265,7 +253,7 @@ const Users: React.FC = () => {
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}
                   >
-                    {getRoleIcon(user.role)} {user.role}
+                    {user.role}
                   </span>
                 </TableCell>
               </tr>

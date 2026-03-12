@@ -36,6 +36,28 @@ async def get_charts_data(
     return service.get_charts_data()
 
 
+@router.get("/workforce-utilization")
+async def get_workforce_utilization(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if current_user["role"] == "worker":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    service = AnalyticsService(db)
+    return service.get_workforce_utilization()
+
+
+@router.get("/budget-trend")
+async def get_budget_trend(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if current_user["role"] == "worker":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    service = AnalyticsService(db)
+    return service.get_budget_trend()
+
+
 @router.get("/team-performance")
 async def get_team_performance(
     project_id: int = None,
