@@ -1,5 +1,9 @@
-project_id,resource_name,resource_type,status,quantity,unit,unit_cost,supplier
-1,solar panels,material,active,1200,units,250,greenlight corp
-1,installation crew,human,in use,10,people,0,brightworks ltd
-2,ai servers,equipment,ordered,5,units,8000,neuralcore gmbh
-3,marine crane,equipment,retired,2,units,150000,oceanlift inc
+project_name,resource_name,resource_type,status,quantity,unit,unit_cost,supplier
+Капитальный ремонт насосной станции НС-3 АНПЗ,Слесарь-монтажник 5 разряда,labor,in_use,6,чел/дн,14000,АВС ГРУП
+Капитальный ремонт насосной станции НС-3 АНПЗ,Сварщик НАКС 5 разряда,labor,in_use,2,чел/дн,18000,АВС ГРУП
+Капитальный ремонт насосной станции НС-3 АНПЗ,Насосный агрегат Н-301 (новый),material,in_use,2,шт,28000000,Grundfos Kazakhstan
+Капитальный ремонт насосной станции НС-3 АНПЗ,Запорная арматура (шаровые краны DN100),material,available,12,шт,350000,КазТрубАрматура
+Капитальный ремонт насосной станции НС-3 АНПЗ,Автокран 25т,equipment,in_use,1,маш/см,120000,АВС ГРУП
+Ревизия колонны К-1 установки АВТ-1 ПНХЗ,Слесарь-монтажник 5 разряда,labor,available,4,чел/дн,14000,АВС ГРУП
+Ревизия колонны К-1 установки АВТ-1 ПНХЗ,Клапанные тарелки К-1 (комплект 8 шт.),material,available,1,комплект,9500000,ПНХЗ-Снаб
+Ревизия колонны К-1 установки АВТ-1 ПНХЗ,Строительные леса (комплект),equipment,available,1,комплект,180000,АВС ГРУП

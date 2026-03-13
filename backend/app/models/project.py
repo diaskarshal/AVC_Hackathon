@@ -29,7 +29,7 @@ class Project(Base):
     spent_amount = Column(Float, default=0.0)
     
     location = Column(String(255))
-    customer = Column(String(255), nullable=True)  # Заказчик (shortened, e.g. "АНПЗ")
+    customer = Column(String(255), nullable=True)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -39,7 +39,7 @@ class Project(Base):
     budgets = relationship("Budget", back_populates="project", cascade="all, delete-orphan")
     
     embedding = Column(JSON, nullable=True)   # Precomputed 384-dim vector
-    embedding_text = Column(Text, nullable=True)  # The text that was embedded
+    embedding_text = Column(Text, nullable=True)
 
     @property
     def budget_utilization(self):

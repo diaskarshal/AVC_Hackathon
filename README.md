@@ -1,170 +1,50 @@
-# BuildFlow ERP System
+# AVC Hackathon
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.119.0-009688.svg)](https://fastapi.tiangolo.com)
-[![React 19](https://img.shields.io/badge/React-19.2.0-61DAFB.svg)](https://reactjs.org/)
+Track: BuildFlow  
 
-**BuildFlow** -- ERP system designed for construction project management.
+ERP-система для автоматизации расчета ресурсов для ремонта заводского оборудования.
 
-![BuildFlow Dashboard](docs/dashboard.png)
-
+Функции: управление проектами, задачами, ресурсами и бюджетами; аналитика по KPI; анализ тендерной документации с автоматическим подбором похожих проектов и формированием плана ресурсов.
 
 ---
 
-## Features
+## Tech stack
 
-### Core Functionality
-- **Project Management**: Create, track, and manage construction projects with timelines and budgets
-- **Task Management**: Plan and track project tasks with dependencies, priorities, and progress tracking
-- **Resource Management**: Track materials, equipment, and labor with cost calculations
-- **Financial Control**: Monitor budgets, expenses, and cost analysis with variance tracking
-- **Multi-User Support**: Role-based access control (Admin, Manager, Worker)
+**Backend:** FastAPI, PostgreSQL 15, SQLAlchemy 2.0, JWT, Pandas, Scikit-learn
 
-### Analytics & Reporting
-- **Real-time KPI Dashboard**: Project progress, budget utilization, task completion rates
-- **Team Performance Tracking**: Monitor individual and team productivity metrics
-- **Budget Breakdown Analysis**: Category-wise spending analysis with variance reporting
-- **Resource Distribution**: Visualize resource allocation across projects
-- **Project Timeline**: Gantt-style timeline view with milestone tracking
-- **ML Predictions**: Predict project completion dates and costs using machine learning
+**Frontend:** React 19 + TypeScript, Tailwind CSS, Recharts, Axios
 
-### Data Management
-- **Data Import**: Import projects, tasks, resources, and budgets from Excel/CSV files
-- **Data Export**: Export any data view to CSV for further analysis
-- **Bulk Operations**: Create and update multiple records efficiently
+**Infrastructure:** Docker
 
 ---
 
-## Tech Stack
+## Get started
 
-### Backend
-- **Framework**: FastAPI 0.119.0
-- **Database**: PostgreSQL 15
-- **ORM**: SQLAlchemy 2.0.23
-- **Authentication**: JWT
-- **Password Hashing**: bcrypt with passlib
-- **Data Processing**: Pandas 2.1.3
-- **ML**: Scikit-learn 1.3.2
-- **File Processing**: openpyxl 3.1.2
+### Requirements
 
-### Frontend
-- **Framework**: React 19.2.0 with TypeScript 4.9.5
-- **Routing**: React Router DOM 6.30.1
-- **Styling**: Tailwind CSS 3.4.18
-- **HTTP Client**: Axios 1.12.2
-- **Charts**: Recharts 2.15.4
-- **Build Tool**: React Scripts 5.0.1
+- Docker & Docker Compose
+- API keys for: Gemini (aistudio.google.com) and Groq (console.groq.com)
 
-### DevOps
-- **Containerization**: Docker & Docker Compose
-- **Web Server**: Uvicorn 0.24.0
-- **Process Manager**: Uvloop 0.21.0
+### Steps
 
----
-
-## Quick Start
-
-### Installation
-
-1. **Clone the repository**
+1. Clone repo:
 ```bash
-git clone https://github.com/diaskarshal/buildflow.git
-cd buildflow
+git clone https://github.com/diaskarshal/AVC_Hackathon.git
+cd AVC_Hackathon
 ```
 
-2. **Configure environment variables**
+2. Create `.env` according to `.env.example`:
+
+3. Start container:
 ```bash
-cd backend
-cp .env.example .env
-cd ..
+sudo docker-compose up --build
 ```
 
-3. **Start the application**
+4. Seed DB:
 ```bash
-docker-compose up --build
+sudo docker-compose exec backend python -m app.utils.seed_data
 ```
 
-4. **Seed the database**
-```bash
-docker-compose exec backend python -m app.utils.seed_data
-```
-
-5. **Access the application**
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Database**: localhost:5432
-
-### Demo Accounts
-
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `admin123` |
-| Manager | `manager1` | `manager123` |
-| Worker | `worker1` | `worker123` |
-| Worker | `worker2` | `worker123` |
-| Worker | `worker3` | `worker123` |
-
----
-
-## Analytics
-```http
-GET    /api/analytics/dashboard                          # Dashboard stats
-GET    /api/analytics/project/{id}/kpi                   # Project KPIs
-GET    /api/analytics/project/{id}/budget-breakdown      # Budget analysis
-GET    /api/analytics/project/{id}/resource-distribution # Resource stats
-GET    /api/analytics/project/{id}/timeline              # Project timeline
-GET    /api/analytics/project/{id}/predict-completion    # ML predictions
-GET    /api/analytics/team-performance                   # Team metrics
-```
-
-### Data Import
-```http
-POST   /api/import/excel        # Import Excel file (Admin only)
-POST   /api/import/csv          # Import CSV file (Admin only)
-```
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-#### Port Already in Use
-```bash
-lsof -ti:3000 | xargs kill -9
-
-lsof -ti:8000 | xargs kill -9
-```
-
-#### Database Connection Failed
-```bash
-docker-compose ps
-
-docker-compose logs db
-
-docker-compose restart db
-```
-
-
-#### Frontend Build Errors
-```bash
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
-
-npm cache clean --force
-```
-
-#### Backend Import Errors
-```bash
-docker-compose build --no-cache backend
-```
-
-#### Database Migration Issues
-```bash
-docker-compose down -v
-docker-compose up --build
-docker-compose exec backend python -m app.utils.seed_data
-```
+- Frontend: http://localhost:3000
+- API: http://localhost:8001
+- API docs: http://localhost:8001/docs

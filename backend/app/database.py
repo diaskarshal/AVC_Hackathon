@@ -19,7 +19,6 @@ def get_db():
 
 def init_db():
     Base.metadata.create_all(bind=engine)
-    # Inline migrations for columns added after initial deploy
     from sqlalchemy import text
     with engine.connect() as conn:
         conn.execute(text(

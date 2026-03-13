@@ -21,8 +21,8 @@ router = APIRouter()
 class AcceptPlanBody(BaseModel):
     plan_id: int
     project_name: Optional[str] = None
-    resources: Optional[list] = None  # edited overrides
-    tasks: Optional[list] = None       # edited overrides
+    resources: Optional[list] = None
+    tasks: Optional[list] = None
 
 
 @router.post("/upload", dependencies=[Depends(require_role("admin", "manager"))])
@@ -31,7 +31,7 @@ async def upload_tender(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
-    """Step 1: Upload a tender document (PDF or Excel)."""
+    """Step 1: Upload a tender document"""
     contents = await file.read()
 
     parser = TenderParserService()
@@ -65,10 +65,8 @@ async def analyze_tender(
     llm = LLMService()
     similarity = SimilarityService(db)
 
-    # Extract structured scope
     parsed_scope = await llm.extract_tender_scope(tender.raw_text or "")
 
-    # Normalize location → city only; customer → known abbreviation
     if parsed_scope.get("location"):
         parsed_scope["location"] = extract_city(parsed_scope["location"])
     if parsed_scope.get("customer"):
@@ -79,32 +77,27 @@ async def analyze_tender(
 
     tender.parsed_scope = parsed_scope
     tender.status = TenderStatus.PARSED
-    # Update tender title with the parsed project name
+
     parsed_title = parsed_scope.get("title") or parsed_scope.get("work_type", "")
     if parsed_title:
         tender.title = parsed_title
 
-    # Compute embedding for the tender — use title + equipment + location for best similarity match
     title = parsed_scope.get("title") or parsed_scope.get("work_type", "")
     equipment_str = " ".join(parsed_scope.get("equipment_list", []))
     lots_names = " ".join(lot.get("name", "") for lot in parsed_scope.get("lots", []))
     query_text = f"{title} {equipment_str} {lots_names} {parsed_scope.get('location', '')}".strip()
     tender.embedding = embed_text(query_text)
 
-    # Find similar historical projects
     similar = similarity.find_similar_projects(query_text, top_k=3)
 
-    # Generate resource plan
     plan_data = await llm.generate_resource_plan(parsed_scope, similar)
 
-    # Calculate total cost from resources
     total_cost = sum(r.get("total_cost", 0) for r in plan_data.get("resources", []))
 
-    # Composite confidence score (not just similarity — that's misleading)
     # Components:
-    #   1. Similarity quality (40%) — best match cosine score
-    #   2. Budget alignment (30%) — how close LLM estimate is to tender budget
-    #   3. Plan completeness (30%) — did the LLM return enough resources + tasks
+    #   1. Similarity quality (40%) - best match cosine score
+    #   2. Budget alignment (30%) - how close LLM estimate is to tender budget
+    #   3. Plan completeness (30%) - did the LLM return enough resources + tasks
     sim_score = similar[0]["similarity_score"] if similar else 0.0
     tender_budget = parsed_scope.get("estimated_budget_kzt", 0)
     llm_total = plan_data.get("estimated_total_cost", 0) or total_cost
@@ -117,10 +110,9 @@ async def analyze_tender(
     completeness = min(1.0, (n_resources / 6) * 0.5 + (n_tasks / 4) * 0.5)
     confidence = round(sim_score * 0.4 + budget_ratio * 0.3 + completeness * 0.3, 3)
 
-    # Store the FULL plan (resources + tasks + reasoning) in plan_data
     resource_plan = TenderResourcePlan(
         tender_id=tender.id,
-        plan_data=plan_data,  # full dict: {resources, tasks, estimated_total_cost, ...}
+        plan_data=plan_data,
         estimated_total_cost=total_cost or plan_data.get("estimated_total_cost", 0),
         estimated_duration_days=plan_data.get("estimated_duration_days", 90),
         similar_project_ids=[sp["project"].id for sp in similar],
@@ -132,7 +124,6 @@ async def analyze_tender(
     db.commit()
     db.refresh(resource_plan)
 
-    # Collect any LLM errors for frontend display
     warnings = []
     if parsed_scope.get("_llm_error"):
         warnings.append(f"Извлечение данных: {parsed_scope['_llm_error']}")
@@ -179,7 +170,6 @@ async def accept_tender_plan(
     scope = tender.parsed_scope or {}
     full_plan = plan.plan_data or {}
 
-    # Create project
     project = Project(
         name=body.project_name or tender.title,
         description=f"Тендер: {scope.get('work_type', '')}. {scope.get('volume_description', '')}",
@@ -193,13 +183,11 @@ async def accept_tender_plan(
     db.add(project)
     db.flush()
 
-    # Use edited overrides if provided, otherwise fall back to stored plan
     resources_list = body.resources if body.resources is not None else (
         full_plan.get("resources", []) if isinstance(full_plan, dict) else full_plan
     )
     tasks_list_override = body.tasks if body.tasks is not None else None
 
-    # Create resources from plan
     rtype_map = {"labor": ResourceType.LABOR, "equipment": ResourceType.EQUIPMENT, "material": ResourceType.MATERIAL}
     for item in (resources_list or []):
         resource = Resource(
@@ -214,7 +202,6 @@ async def accept_tender_plan(
         resource.calculate_total_cost()
         db.add(resource)
 
-    # Create tasks from plan
     tasks_list = tasks_list_override if tasks_list_override is not None else (
         full_plan.get("tasks", []) if isinstance(full_plan, dict) else []
     )
@@ -235,7 +222,6 @@ async def accept_tender_plan(
         db.add(task)
         start = start + timedelta(days=duration)
 
-    # Create budget entry
     confidence_str = f"{plan.confidence_score:.0%}" if plan.confidence_score else "N/A"
     budget = Budget(
         project_id=project.id,
@@ -246,13 +232,11 @@ async def accept_tender_plan(
     )
     db.add(budget)
 
-    # Mark tender as accepted
     tender.status = TenderStatus.ACCEPTED
     tender.created_project_id = project.id
     db.commit()
     db.refresh(project)
 
-    # Index the new project so future similarity searches can find it
     similarity = SimilarityService(db)
     similarity.index_project(project)
 
@@ -266,19 +250,17 @@ async def accept_tender_plan(
 
 @router.get("/hot-deals", dependencies=[Depends(get_current_user)])
 async def get_hot_deals():
-    """Return relevant open tenders from key partner companies (Goszakup/Samruk-Kazyna)."""
     import httpx, asyncio
 
     TARGET_COMPANIES = [
         "КАЗАХСТАН ПЕТРОКЕМИКАЛ ИНДАСТРИЗ",
         "АТЫРАУСКИЙ НЕФТЕПЕРЕРАБАТЫВАЮЩИЙ ЗАВОД",
         "ПАВЛОДАРСКИЙ НЕФТЕХИМИЧЕСКИЙ ЗАВОД",
-        "KPI",
         "АНПЗ",
         "ПНХЗ",
     ]
 
-    # Try Goszakup public API (no auth required for search)
+    # Goszakup public API
     live_deals = []
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
@@ -310,18 +292,16 @@ async def get_hot_deals():
     if live_deals:
         return {"deals": live_deals, "is_demo": False}
 
-    # Fallback: demo tenders (Goszakup API unavailable — requires auth token)
+    #demo tenders if Goszakup API unavailable
     import random
     from datetime import date, timedelta
     today = date.today()
 
     def gz_url(number: str) -> str:
-        """Goszakup direct search URL for a tender number."""
         from urllib.parse import quote
         return f"https://goszakup.gov.kz/ru/announces/index?filter[name]={quote(number)}"
 
     def sk_url(number: str) -> str:
-        """Samruk-Kazyna portal search URL for a tender number."""
         from urllib.parse import quote
         return f"https://zakup.sk.kz/Searching?query={quote(number)}"
 
@@ -443,7 +423,6 @@ async def get_hot_deals():
 
 @router.get("/", dependencies=[Depends(get_current_user)])
 async def list_tenders(db: Session = Depends(get_db)):
-    """List all tenders."""
     tenders = db.query(Tender).order_by(Tender.created_at.desc()).all()
     return [
         {
@@ -458,7 +437,6 @@ async def list_tenders(db: Session = Depends(get_db)):
 
 @router.delete("/{tender_id}", dependencies=[Depends(require_role("admin", "manager"))])
 async def delete_tender(tender_id: int, db: Session = Depends(get_db)):
-    """Delete a tender and all its associated plans."""
     tender = db.query(Tender).filter(Tender.id == tender_id).first()
     if not tender:
         raise HTTPException(status_code=404, detail="Tender not found")

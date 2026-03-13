@@ -2,9 +2,6 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List
 
-# Multilingual model — critical for Russian-language tender/project data.
-# all-MiniLM-L6-v2 was English-only and produced poor similarity scores
-# for Cyrillic text. This model supports 50+ languages including Russian.
 _model = None
 _MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
 

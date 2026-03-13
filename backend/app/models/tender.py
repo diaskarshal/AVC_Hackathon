@@ -17,20 +17,17 @@ class Tender(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(500), nullable=False)
-    source = Column(String(100)) #goszakup, samruk, other
+    source = Column(String(100))
     lot_number = Column(String(100))
     status = Column(Enum(TenderStatus), default=TenderStatus.UPLOADED)
 
-    # Raw extracted text from document
     raw_text = Column(Text)
 
-    # Structured data extracted by LLM (stored as JSON)
-    parsed_scope = Column(JSON)            # {work_type, equipment, location, volume, deadline_days}
+    parsed_scope = Column(JSON)
 
     # Embedding vector stored as JSON list (for similarity search)
-    embedding = Column(JSON)               # list of 384 floats
+    embedding = Column(JSON)
 
-    # Reference to the project created from this tender (if accepted)
     created_project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
 
     file_name = Column(String(255))
@@ -48,26 +45,15 @@ class TenderResourcePlan(Base):
     id = Column(Integer, primary_key=True, index=True)
     tender_id = Column(Integer, ForeignKey("tenders.id"), nullable=False)
 
-    # The full plan as JSON — list of resource items
     plan_data = Column(JSON)
-    # [{
-    #   "resource_type": "labor|material|equipment",
-    #   "name": "Сварщик 5 разряда",
-    #   "quantity": 4,
-    #   "unit": "чел/дн",
-    #   "unit_cost": 15000,
-    #   "total_cost": 60000,
-    #   "notes": "На основе проекта ANPZ-2023"
-    # }]
 
     estimated_total_cost = Column(Float, default=0.0)
     estimated_duration_days = Column(Integer)
 
-    # Which historical project(s) were used as reference
-    similar_project_ids = Column(JSON)     # [1, 3, 5]
-    confidence_score = Column(Float)       # 0.0 - 1.0
+    similar_project_ids = Column(JSON)
+    confidence_score = Column(Float)
 
-    llm_reasoning = Column(Text)           # LLM's explanation of the estimate
+    llm_reasoning = Column(Text)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 

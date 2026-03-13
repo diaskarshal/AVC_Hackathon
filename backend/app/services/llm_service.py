@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-# Config keys as fallback (in case env var is empty)
 try:
     from app.config import settings as _cfg
     _GEMINI_FALLBACK = _cfg.GEMINI_API_KEY
@@ -22,7 +21,6 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY") or _GROQ_FALLBACK
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# Real AVC GROUP company profile for LLM context calibration
 AVC_COMPANY_CONTEXT = """
 AVC GROUP — EPC-подрядчик по ремонту нефтеперерабатывающих заводов в Казахстане.
 
@@ -56,17 +54,15 @@ AVC GROUP — EPC-подрядчик по ремонту нефтеперера�
 """
 
 class LLMError(Exception):
-    """Raised when both LLM providers fail after retries."""
     pass
 
 
 class LLMService:
 
     MAX_RETRIES = 2
-    RETRY_DELAY = 1.5  # seconds
+    RETRY_DELAY = 1.5
 
     def _clean_json(self, text: str) -> str:
-        """Strip markdown fences and whitespace from LLM JSON response."""
         clean = text.strip()
         if clean.startswith("```"):
             clean = clean.split("```")[1]
@@ -100,7 +96,7 @@ Extract its full name for the "customer" field.
 The procurement name appears at the very TOP of the text, labelled:
   НАИМЕНОВАНИЕ ЗАКУПКИ: <actual project name here>
 
-⚠️ Use that labelled value for "title".
+Use that labelled value for "title".
 The column "Наименование и краткая характеристика" in the lot table contains
 a GENERIC CATEGORY CODE (e.g. "Работы по ремонту/модернизации нефтеперерабатывающих
 установок...") — do NOT use it for "title". Use ONLY the НАИМЕНОВАНИЕ ЗАКУПКИ line.
@@ -207,10 +203,8 @@ Respond with ONLY the JSON object. No markdown fences. No explanation."""
         material_share = int(budget * 0.30)
         equipment_share = int(budget * 0.20)
 
-        # Pre-compute realistic headcounts from the actual budget so the LLM
-        # can't drift to unrealistic numbers. These are HINTS, not hard caps.
-        avg_labor_rate: int = 45_000   # KZT/day (mid-range skilled worker)
-        avg_equip_rate: int = 150_000  # KZT/shift
+        avg_labor_rate: int = 45_000
+        avg_equip_rate: int = 150_000
         implied_workers = max(1, round(labor_share / (avg_labor_rate * deadline))) if deadline > 0 else 10
         implied_equip   = max(1, round(equipment_share / (avg_equip_rate * deadline))) if deadline > 0 else 2
 
@@ -240,7 +234,7 @@ BUDGET BREAKDOWN (mandatory targets):
   Materials~{material_share:,.0f} KZT  (30%)
   Equipment~{equipment_share:,.0f} KZT  (20%)  → ~{implied_equip} machines
 
-⚠️ CRITICAL — HOW TO COMPUTE total_cost FOR EACH RESOURCE:
+CRITICAL — HOW TO COMPUTE total_cost FOR EACH RESOURCE:
   • LABOR:     total_cost = quantity (number of workers) × unit_cost (KZT/day) × {deadline} days
                Example: 10 workers × 45 000 KZT/day × {deadline} days = {10*45_000*deadline:,.0f} KZT
   • EQUIPMENT: total_cost = quantity (shifts over whole project) × unit_cost (KZT/shift)
@@ -315,17 +309,12 @@ Validation rules:
             resources = result.get("resources", [])
             duration = int(result.get("estimated_duration_days") or deadline)
 
-            # ── Enforce correct labor cost server-side ──────────────────────
-            # LLMs often compute total_cost = workers × rate × 1 day instead of
-            # workers × rate × duration_days. We correct this unconditionally.
             for r in resources:
                 qty = float(r.get("quantity") or 0)
                 rate = float(r.get("unit_cost") or 0)
                 if r.get("resource_type") == "labor" and qty > 0 and rate > 0:
                     r["total_cost"] = round(qty * rate * duration)
                 elif r.get("resource_type") in ("material", "equipment") and qty > 0 and rate > 0:
-                    # Keep LLM value for materials/equipment; only recompute if
-                    # total_cost is suspiciously small (less than qty × rate)
                     llm_tc = float(r.get("total_cost") or 0)
                     expected_min = qty * rate
                     if llm_tc < expected_min * 0.5:

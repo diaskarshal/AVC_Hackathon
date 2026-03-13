@@ -14,9 +14,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     ALLOWED_EXTENSIONS: str = ".xlsx,.xls,.csv"
     
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str = "secret"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 480  # 8 hours
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
     
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
     

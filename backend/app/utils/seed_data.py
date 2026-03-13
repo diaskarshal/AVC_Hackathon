@@ -1,5 +1,3 @@
-# Run with: docker-compose exec backend python -m app.utils.seed_data
-
 from datetime import datetime
 from app.database import SessionLocal
 from app.models import (

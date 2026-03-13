@@ -15,7 +15,7 @@ DEMO_USERS = {
     "admin": {
         "username": "admin",
         "role": "admin",
-        "name": "John Admin",
+        "name": "Arman",
         "email": "admin@buildflow.com",
         "worker_name": None,
         "managed_projects": [],
@@ -23,15 +23,15 @@ DEMO_USERS = {
     "manager1": {
         "username": "manager1",
         "role": "manager",
-        "name": "Sarah Manager",
-        "email": "sarah@buildflow.com",
+        "name": "Aruzhan",
+        "email": "aruzhan@buildflow.com",
         "worker_name": None,
         "managed_projects": [1, 2],
     },
     "worker1": {
         "username": "worker1",
         "role": "worker",
-        "name": "Mike Construction",
+        "name": "Mike",
         "email": "mike@buildflow.com",
         "worker_name": "Mike Construction",
         "managed_projects": [],
@@ -39,9 +39,9 @@ DEMO_USERS = {
     "worker2": {
         "username": "worker2",
         "role": "worker",
-        "name": "Lisa Field",
-        "email": "lisa@buildflow.com",
-        "worker_name": "Lisa Field",
+        "name": "Alisa Field",
+        "email": "alisa@buildflow.com",
+        "worker_name": "Alisa Field",
         "managed_projects": [],
     },
     "worker3": {

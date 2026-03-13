@@ -9,5 +9,3 @@ node_modules/
 frontend/package-lock.json
 dist/
 build/
-
-.claude/

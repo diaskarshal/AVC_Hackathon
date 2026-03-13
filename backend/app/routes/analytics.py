@@ -8,7 +8,6 @@ router = APIRouter()
 
 
 def _check_manager_access(current_user: dict, project_id: int):
-    """Raise 403 if a manager tries to access a project they don't manage."""
     if current_user["role"] == "manager":
         managed = current_user.get("managed_projects", [])
         if project_id not in managed:
@@ -19,7 +18,6 @@ def _check_manager_access(current_user: dict, project_id: int):
 
 
 def _deny_worker(current_user: dict, detail: str = "Access denied"):
-    """Raise 403 if the current user is a worker."""
     if current_user["role"] == "worker":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=detail

@@ -322,8 +322,7 @@ class AnalyticsService:
         }
 
     def get_workforce_utilization(self) -> Dict:
-        """Company capacity vs deployed workers across active projects."""
-        TOTAL_CAPACITY = 1000  # AVC GROUP штатная численность
+        TOTAL_CAPACITY = 1000
 
         active_projects = self.db.query(Project).filter(
             Project.status == ProjectStatus.IN_PROGRESS
@@ -331,7 +330,6 @@ class AnalyticsService:
 
         active_ids = [p.id for p in active_projects]
 
-        # Sum labour resources per project
         project_workforce = []
         total_deployed = 0
         for p in active_projects:
@@ -348,7 +346,6 @@ class AnalyticsService:
                 "budget": round(p.total_budget / 1_000_000, 1),
             })
 
-        # Sort descending by workers
         project_workforce.sort(key=lambda x: x["workers"], reverse=True)
 
         utilization_pct = round(total_deployed / TOTAL_CAPACITY * 100, 1) if TOTAL_CAPACITY > 0 else 0
@@ -363,19 +360,16 @@ class AnalyticsService:
         }
 
     def get_budget_trend(self) -> Dict:
-        """Monthly cumulative planned budget vs actual spent, plus a forecast line."""
         from collections import defaultdict
         import calendar
 
         projects = self.db.query(Project).all()
 
-        # Build monthly buckets: { "YYYY-MM": {"planned": X, "spent": Y} }
         monthly: Dict[str, Dict[str, float]] = defaultdict(lambda: {"planned": 0.0, "spent": 0.0})
 
         for p in projects:
             if not p.start_date:
                 continue
-            # Attribute the entire planned budget to the project's start month
             month_key = p.start_date.strftime("%Y-%m")
             monthly[month_key]["planned"] += float(p.total_budget or 0)
             monthly[month_key]["spent"] += float(p.spent_amount or 0)
@@ -383,7 +377,6 @@ class AnalyticsService:
         if not monthly:
             return {"months": [], "planned": [], "actual": [], "forecast": []}
 
-        # Sort months
         sorted_months = sorted(monthly.keys())
         months_out = []
         cumulative_planned = []
@@ -402,7 +395,6 @@ class AnalyticsService:
         n = len(months_out)
         slope = (cumulative_actual[-1] / n) if n > 0 else 0
 
-        # Project 3 more months forward
         forecast_months = []
         forecast_values = []
         last_m = sorted_months[-1]

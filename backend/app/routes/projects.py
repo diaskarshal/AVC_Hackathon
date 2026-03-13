@@ -123,10 +123,9 @@ async def update_project(
 @router.delete(
     "/{project_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(require_role("admin"))],  # Admin only
+    dependencies=[Depends(require_role("admin"))],
 )
 async def delete_project(project_id: int, db: Session = Depends(get_db)):
-    # Nullify tender FK references before deleting the project
     db.query(Tender).filter(Tender.created_project_id == project_id).update(
         {"created_project_id": None}
     )
