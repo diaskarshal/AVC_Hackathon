@@ -2,9 +2,7 @@
 
 Track: BuildFlow  
 
-ERP-система для автоматизации расчета ресурсов для ремонта заводского оборудования.
-
-Функции: управление проектами, задачами, ресурсами и бюджетами; аналитика по KPI; анализ тендерной документации с автоматическим подбором похожих проектов и формированием плана ресурсов.
+ERP for automating resource planning on industrial construction and repair projects in  Kazakhstan's petroleum sector.
 
 ---
 
